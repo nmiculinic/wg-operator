@@ -41,6 +41,7 @@ AllowedIps = {{ .Spec.Address }}/32 {{- range .Spec.ExtraAllowedIPs }}, {{ . }}{
 Endpoint = {{ .Spec.Endpoint}}:{{ .Spec.ListenPort }}
 {{- end }}
 `
+var clientTemplate = template.Must(template.New("client").Parse(clientTemplateSpec))
 
 
 func CreateClientConfig(req ClientRequest) (string, error) {
@@ -49,8 +50,7 @@ func CreateClientConfig(req ClientRequest) (string, error) {
 	}
 
 	buff := &bytes.Buffer{}
-	t := template.Must(template.New("client").Parse(clientTemplateSpec))
-	if err := t.Execute(buff, req); err != nil {
+	if err := clientTemplate.Execute(buff, req); err != nil {
 		return "", err
 	}
 	return buff.String(), nil
