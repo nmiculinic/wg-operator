@@ -18,6 +18,13 @@ func (c *ClientRequest) Validate() error {
 	if net.ParseIP(c.Client.Spec.Address) == nil {
 		return fmt.Errorf("invalid client ip")
 	}
+	for _, srv := range c.Servers.Items {
+		for _, addr := range srv.Spec.ExtraAllowedIPs {
+			if _, _, err := net.ParseCIDR(addr); err != nil {
+				return fmt.Errorf("cannot parse CIDR %s for server %s", addr, srv.Name)
+			}
+		}
+	}
 	return nil
 }
 
@@ -30,7 +37,7 @@ ListenPort = {{ .Client.Spec.ListenPort }}
 
 [Peer]
 PublicKey = {{ .Spec.PublicKey }}
-AllowedIps = {{ .Spec.Address }}/32
+AllowedIps = {{ .Spec.Address }}/32 {{- range .Spec.ExtraAllowedIPs }}, {{ . }}{{- end }}
 Endpoint = {{ .Spec.Endpoint}}:{{ .Spec.ListenPort }}
 {{- end }}
 `
