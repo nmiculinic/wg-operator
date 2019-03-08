@@ -42,6 +42,7 @@ rules:
   - wg.krakensystems.co
   resources:
   - '*'
-  - clients
   verbs:
-  - '*'
+  - 'get'
+  - 'list'
+  - 'watch'
