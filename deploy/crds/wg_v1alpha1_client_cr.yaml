@@ -1,0 +1,7 @@
+apiVersion: wg.krakensystems.co/v1alpha1
+kind: Client
+metadata:
+  name: example-client
+spec:
+  # Add fields here
+  size: 3
