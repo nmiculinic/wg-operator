@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 
 	"k8s.io/apimachinery/pkg/runtime"
@@ -75,7 +74,7 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 		log.Error(err, "Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	}
 	for _, cl := range clients.Items {
-		log.Info("found client", "name", cl.Name)
+		log.Info("found client", "name", cl.Name, "pubKey", cl.Spec.PublicKey, "IPs", cl.Spec.AllowedIPs)
 	}
 	return reconcile.Result{}, nil
 }

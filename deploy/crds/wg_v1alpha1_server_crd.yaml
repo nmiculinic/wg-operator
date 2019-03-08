@@ -23,6 +23,26 @@ spec:
         metadata:
           type: object
         spec:
+          properties:
+            address:
+              type: string
+            endpoint:
+              type: string
+            extraAllowedIPs:
+              items:
+                type: string
+              type: array
+            listenPort:
+              format: int64
+              type: integer
+            publicKey:
+              type: string
+          required:
+          - publicKey
+          - address
+          - extraAllowedIPs
+          - listenPort
+          - endpoint
           type: object
         status:
           type: object

@@ -3,5 +3,4 @@ kind: Client
 metadata:
   name: example-client
 spec:
-  # Add fields here
-  size: 3
+  publicKey: "CLIENT_PUB_KEY"

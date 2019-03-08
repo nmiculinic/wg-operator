@@ -1,4 +1,4 @@
-ˍ# wg-operator 
+# wg-operator 
 
 This project aim to dynamically reconfigure wireguard on the fly for the cluster nodes. 
 

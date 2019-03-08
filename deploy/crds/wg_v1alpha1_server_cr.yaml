@@ -3,5 +3,4 @@ kind: Server
 metadata:
   name: example-server
 spec:
-  # Add fields here
-  size: 3
+  publicKey: "SERVER_PUB_KEY"
