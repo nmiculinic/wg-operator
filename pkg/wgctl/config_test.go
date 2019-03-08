@@ -1,8 +1,10 @@
 package wgctl
 
 import (
+	"fmt"
 	"github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/apis/meta/v1"
 	"testing"
 )
 
@@ -54,6 +56,7 @@ var (
 		},
 	}
 	server3 = v1alpha1.Server{
+		ObjectMeta: v1.ObjectMeta{Name:"server3"},
 		Spec:v1alpha1.ServerSpec{
 			CommonSpec:v1alpha1.CommonSpec{
 				PublicKey: "pub-key-server3",
@@ -165,6 +168,70 @@ Endpoint = 55.12.23.34:123
 				assert.NoError(t, err)
 			} else {
 				assert.Error(t, err)
+			}
+			assert.Equal(t, testCase.targetConfig, result)
+		})
+	}
+}
+
+type serverTestCase struct {
+	req ServerRequest
+	targetConfig string
+	targetError error
+}
+
+func TestServer(t *testing.T) {
+	tbl := map[string]serverTestCase{
+		"no-server": {
+			req: ServerRequest{
+					Me:         server3,
+					PrivateKey: "PRIVATE_KEY",
+					Servers: v1alpha1.ServerList{Items: []v1alpha1.Server{server3}},
+					Clients: v1alpha1.ClientList{},
+				},
+			targetConfig: "",
+			targetError:fmt.Errorf("me: [server3] has same address as server server3 -> 10.100.2.1"),
+		},
+		"2server-2clients": {
+			req: ServerRequest{
+				Me:         server3,
+				PrivateKey: "PRIVATE_KEY",
+				Servers: v1alpha1.ServerList{Items: []v1alpha1.Server{server1}},
+				Clients: v1alpha1.ClientList{Items:[]v1alpha1.Client{cl1, cl2}},
+			},
+			targetConfig:
+				`[Interface]
+Address = 10.100.2.1
+PrivateKey = PRIVATE_KEY
+ListenPort = 123
+
+[Peer]
+PublicKey = pub-key-server1
+AllowedIps = 10.100.1.1/32
+Endpoint = 35.12.23.34:555
+
+[Peer]
+PublicKey = pub-key-cl1
+AllowedIps = 10.100.0.1/32
+
+[Peer]
+PublicKey = pub-key-cl2
+AllowedIps = 10.100.0.2/32
+`,
+		},
+	}
+	for name , testCase := range tbl {
+		t.Run(name, func(t *testing.T) {
+			result, err := CreateServerConfig(testCase.req)
+			if err != nil {
+				t.Log("err", err.Error())
+			}
+
+			if testCase.targetError == nil {
+				assert.NoError(t, err)
+			} else {
+				assert.Error(t, err)
+				assert.Equal(t, testCase.targetError.Error(), err.Error())
 			}
 			assert.Equal(t, testCase.targetConfig, result)
 		})
