@@ -1,0 +1,55 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  TAG_FULL: ${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA} # Warning duplication in IMAGE_FULL. It's here due to gitlab...
+  IMAGE_BRANCH: ${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}
+  IMAGE_FULL: ${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
+
+go_build:
+  tags:
+    - docker
+    - ascalia
+  variables:
+    DOCKERVERSION: 18.09.3
+  before_script:
+    - export GL_URL=$(echo $CI_PROJECT_URL | awk -F/ '{print $3}')
+    - export GO_PROJECT_PATH="$GOPATH/src/$GL_URL/$CI_PROJECT_NAMESPACE"
+    - mkdir -p $GO_PROJECT_PATH
+    - ln -s $(pwd) $GO_PROJECT_PATH
+    - export GO_PROJECT_PATH="$GO_PROJECT_PATH/$CI_PROJECT_NAME"
+    - cd $GO_PROJECT_PATH
+    - go get github.com/golang/dep/cmd/dep  # Install dep
+    - mkdir -p $GOPATH/src/github.com/operator-framework
+    - cd $GOPATH/src/github.com/operator-framework
+    - git clone https://github.com/operator-framework/operator-sdk
+    - cd operator-sdk
+    - git checkout master
+    - make dep
+    - make install
+    - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
+    - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
+    - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
+    - cd $GO_PROJECT_PATH
+    - pwd
+  services:
+    - docker:dind
+  stage: build
+  image: golang:1.12
+  script:
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
+    - dep ensure -vendor-only
+    - operator-sdk build ${IMAGE_FULL}
+    - operator-sdk build ${IMAGE_BRANCH}
+    - docker push ${IMAGE_FULL}
+    - docker push ${IMAGE_BRANCH}
+  artifacts:
+    paths:
+      - build/
+    expire_in: 1 week
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - vendor/
+
