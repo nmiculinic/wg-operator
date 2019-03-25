@@ -1,6 +1,5 @@
 stages:
   - build
-  - deploy
 
 variables:
   TAG_FULL: ${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA} # Warning duplication in IMAGE_FULL. It's here due to gitlab...
@@ -8,9 +7,6 @@ variables:
   IMAGE_FULL: ${CI_REGISTRY}/${CI_PROJECT_PATH}:${CI_COMMIT_REF_NAME}-${CI_COMMIT_SHORT_SHA}
 
 go_build:
-  tags:
-    - docker
-    - ascalia
   variables:
     DOCKERVERSION: 18.09.3
   before_script:
