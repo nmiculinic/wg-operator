@@ -32,16 +32,12 @@ spec:
               items:
                 type: string
               type: array
-            listenPort:
-              format: int64
-              type: integer
             publicKey:
               type: string
           required:
           - publicKey
           - address
           - extraAllowedIPs
-          - listenPort
           - endpoint
           type: object
         status:

@@ -73,3 +73,11 @@ required = [
   [[prune.project]]
     name = "k8s.io/gengo"
     non-go = false
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/mdlayher/wireguardctrl"
+
+[[constraint]]
+  name = "github.com/Masterminds/sprig"
+  version = "2.19.0"
