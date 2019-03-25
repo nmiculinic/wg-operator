@@ -111,16 +111,20 @@ func main() {
 	}
 	switch *mode {
 	case "client":
+		log.Info("Running in client mode", "name", *nodeName)
 		if err := client.Add(mgr, wg); err != nil {
 			log.Error(err, "")
 			os.Exit(1)
 		}
 	case "server":
+		log.Info("Running in server mode", "name", *nodeName)
 		if err := server.Add(mgr, wg); err != nil {
 			log.Error(err, "")
 			os.Exit(1)
 		}
 	default:
+		log.Info("unknown mode: " + *mode)
+		os.Exit(5)
 	}
 	log.Info("Starting the Cmd.")
 

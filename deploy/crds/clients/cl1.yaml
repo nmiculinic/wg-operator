@@ -1,0 +1,13 @@
+apiVersion: wg.krakensystems.co/v1alpha1
+kind: Client
+metadata:
+  name: cl1
+  annotations:
+    priv-key: |
+      wg-operator (wireguardctl) ✗ wg genkey | tee /dev/stderr | wg pubkey
+      CG9hQWXc0zyo8GCNshT3K/6tt0XbVtuAT8oXQ9/igFc=
+      oj/x/PIWqBGgE7NQqtum4ZD+2vruwRmcuTl8/VWwPnc=
+spec:
+  publicKey: oj/x/PIWqBGgE7NQqtum4ZD+2vruwRmcuTl8/VWwPnc=
+  address: "10.102.0.10"
+  extraAllowedIPs: []

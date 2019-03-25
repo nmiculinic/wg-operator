@@ -84,12 +84,13 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 
 	reqLogger.Info(fmt.Sprintf("about to apply config:\n%s", cfg.String()), "interface", r.wgSetup.InterfaceName)
 	if err := r.wgSetup.SetPrivateKey(cfg); err != nil {
+		reqLogger.Error(err, "cannot read private key file", "file", r.wgSetup.PrivateKeyFile)
 		return reconcile.Result{}, err
 	}
 
-	if err := r.wgSetup.Client.ConfigureDevice(r.wgSetup.InterfaceName, cfg.Config); err != nil {
+	reqLogger.Info("loaded private key file", "file", r.wgSetup.PrivateKeyFile)
+	if err := r.wgSetup.SyncConfigToMachine(cfg); err != nil {
 		return reconcile.Result{}, err
 	}
-
 	return reconcile.Result{}, nil
 }

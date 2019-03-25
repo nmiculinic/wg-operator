@@ -1,0 +1,10 @@
+apiVersion: wg.krakensystems.co/v1alpha1
+kind: Server
+metadata:
+  name: k8s-3
+spec:
+  publicKey: A0//xScnnJMGbXr5WRZ1VCpGM0c7vLRg/Dkvmcxywh0=
+  address: "10.100.0.3"
+  extraAllowedIPs:
+  - "10.100.0.0/15"
+  endpoint: 136.243.89.93:5555
