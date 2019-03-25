@@ -33,15 +33,18 @@ func (n *WireguardSetup) SetPrivateKey(cfg *Config) error {
 
 func (n *WireguardSetup) SyncConfigToMachine(cfg *Config) error {
 	if err := n.Client.ConfigureDevice(n.InterfaceName, cfg.Config); err != nil {
+		log.Error(err, "cannot configure device", "iface", n.InterfaceName)
 		return err
 	}
 	dev, err := n.Client.Device(n.InterfaceName)
 	if err != nil {
+		log.Error(err, "cannot get device", "iface", n.InterfaceName)
 		return err
 	}
 
 	link, err := netlink.LinkByName(dev.Name)
 	if err != nil {
+		log.Error(err, "cannot read link")
 		return err
 	}
 
