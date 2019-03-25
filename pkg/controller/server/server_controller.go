@@ -1,9 +1,11 @@
 package server
 
 import (
+	"context"
+	"fmt"
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
+	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
 
-	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -16,42 +18,27 @@ import (
 
 var log = logf.Log.WithName("controller_server")
 
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
-
-// Add creates a new Server Controller and adds it to the Manager. The Manager will set fields on the Controller
+// Add creates a new Client Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
+func Add(mgr manager.Manager, setup *wgctl.WireguardSetup) error {
+	r := &ReconcileClient{
+		client:  mgr.GetClient(),
+		scheme:  mgr.GetScheme(),
+		wgSetup: setup,
+	}
 
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileServer{client: mgr.GetClient(), scheme: mgr.GetScheme()}
-}
-
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Create a new controller
 	c, err := controller.New("server-controller", mgr, controller.Options{Reconciler: r})
 	if err != nil {
 		return err
 	}
 
-	// Watch for changes to primary resource Server
-	err = c.Watch(&source.Kind{Type: &wgv1alpha1.Server{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &wgv1alpha1.Client{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
 
-	// TODO(user): Modify this to be the types you create that are owned by the primary resource
-	// Watch for changes to secondary resource Pods and requeue the owner Server
-	err = c.Watch(&source.Kind{Type: &corev1.Pod{}}, &handler.EnqueueRequestForOwner{
-		IsController: true,
-		OwnerType:    &wgv1alpha1.Server{},
-	})
+	err = c.Watch(&source.Kind{Type: &wgv1alpha1.Server{}}, &handler.EnqueueRequestForObject{})
 	if err != nil {
 		return err
 	}
@@ -59,20 +46,58 @@ func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	return nil
 }
 
-var _ reconcile.Reconciler = &ReconcileServer{}
+var _ reconcile.Reconciler = &ReconcileClient{}
 
-// ReconcileServer reconciles a Server object
-type ReconcileServer struct {
+// ReconcileClient reconciles a Client object
+type ReconcileClient struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
+	client  client.Client
+	scheme  *runtime.Scheme
+	wgSetup *wgctl.WireguardSetup
 }
 
-func (r *ReconcileServer) Reconcile(request reconcile.Request) (reconcile.Result, error) {
+func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result, error) {
 	reqLogger := log.WithValues("Request.Namespace", request.Namespace, "Request.Name", request.Name)
-	reqLogger.Info("Reconciling Server")
-	// TODO
+	reqLogger.Info("Reconciling Client")
+	ctx := context.Background()
+
+	me := &wgv1alpha1.Server{}
+	if err := r.client.Get(ctx, client.ObjectKey{Name: r.wgSetup.NodeName, Namespace: request.Namespace}, me); err != nil {
+		log.Error(err, "cannot find myself as server", "Namespace", request.Namespace, "Name", r.wgSetup.NodeName)
+		return reconcile.Result{}, err
+	}
+
+	clients := &wgv1alpha1.ClientList{}
+	if err := r.client.List(ctx, &client.ListOptions{Namespace: request.Namespace}, clients); err != nil {
+		log.Error(err, "cannot list all client", "Request.Namespace", request.Namespace)
+		return reconcile.Result{}, err
+	}
+
+	servers := &wgv1alpha1.ServerList{}
+	if err := r.client.List(ctx, &client.ListOptions{Namespace: request.Namespace}, servers); err != nil {
+		log.Error(err, "cannot list all servers", "Request.Namespace", request.Namespace)
+		return reconcile.Result{}, err
+	}
+
+	cfg, err := wgctl.CreateServerConfig(wgctl.ServerRequest{
+		PrivateKey: "AAAA",
+		Me:         *me,
+		Clients:    *clients,
+		Servers:    *servers,
+	})
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	reqLogger.Info(fmt.Sprintf("about to apply config:\n%s", cfg.String()), "interface", r.wgSetup.InterfaceName)
+	if err := r.wgSetup.SetPrivateKey(cfg); err != nil {
+		return reconcile.Result{}, err
+	}
+
+	if err := r.wgSetup.Client.ConfigureDevice(r.wgSetup.InterfaceName, cfg.Config); err != nil {
+		return reconcile.Result{}, err
+	}
+
 	return reconcile.Result{}, nil
 }
-

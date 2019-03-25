@@ -1,18 +1,18 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
+	"github.com/KrakenSystems/wg-operator/pkg/controller/client"
+	"github.com/KrakenSystems/wg-operator/pkg/controller/server"
+	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
+	"github.com/mdlayher/wireguardctrl"
 	"os"
 	"runtime"
 
 	"github.com/KrakenSystems/wg-operator/pkg/apis"
-	"github.com/KrakenSystems/wg-operator/pkg/controller"
-
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	"github.com/operator-framework/operator-sdk/pkg/log/zap"
-	"github.com/operator-framework/operator-sdk/pkg/metrics"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/spf13/pflag"
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -36,6 +36,11 @@ func printVersion() {
 }
 
 func main() {
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Error(err, "cannot retrieve hostname")
+		os.Exit(2)
+	}
 	// Add the zap logger flag set to the CLI. The flag set must
 	// be added before calling pflag.Parse().
 	pflag.CommandLine.AddFlagSet(zap.FlagSet())
@@ -43,6 +48,10 @@ func main() {
 	// Add flags registered by imported packages (e.g. glog and
 	// controller-runtime)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
+	mode := pflag.String("mode", "client", "mode the controller is in (server/client)")
+	nodeName := pflag.String("node-name", hostname, "hostname")
+	interfaceName := pflag.String("wg-interface", "wg0", "interface to configure")
+	privateKeyFile := pflag.String("wg-private-key-file", "/etc/wireguard/wg0.key", "wireguard private key file")
 
 	pflag.Parse()
 
@@ -71,8 +80,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	ctx := context.TODO()
-
 	// Create a new Cmd to provide shared dependencies and start components
 	mgr, err := manager.New(cfg, manager.Options{
 		Namespace:          namespace,
@@ -90,19 +97,31 @@ func main() {
 		log.Error(err, "")
 		os.Exit(1)
 	}
-
-	// Setup all Controllers
-	if err := controller.AddToManager(mgr); err != nil {
-		log.Error(err, "")
-		os.Exit(1)
-	}
-
-	// Create Service object to expose the metrics port.
-	_, err = metrics.ExposeMetricsPort(ctx, metricsPort)
+	cl, err := wireguardctrl.New()
 	if err != nil {
-		log.Info(err.Error())
+		log.Error(err, "cannot setup wireguard device")
+		os.Exit(3)
 	}
 
+	wg := &wgctl.WireguardSetup{
+		NodeName:       *nodeName,
+		InterfaceName:  *interfaceName,
+		PrivateKeyFile: *privateKeyFile,
+		Client:         cl,
+	}
+	switch *mode {
+	case "client":
+		if err := client.Add(mgr, wg); err != nil {
+			log.Error(err, "")
+			os.Exit(1)
+		}
+	case "server":
+		if err := server.Add(mgr, wg); err != nil {
+			log.Error(err, "")
+			os.Exit(1)
+		}
+	default:
+	}
 	log.Info("Starting the Cmd.")
 
 	// Start the Cmd

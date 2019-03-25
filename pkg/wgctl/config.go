@@ -2,10 +2,10 @@ package wgctl
 
 import (
 	"bytes"
-	"github.com/Masterminds/sprig"
 	"encoding/base64"
 	"fmt"
 	"github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
+	"github.com/Masterminds/sprig"
 	"github.com/mdlayher/wireguardctrl/wgtypes"
 	"net"
 	"text/template"
@@ -16,9 +16,23 @@ type Config struct {
 	Address net.IP
 }
 
-// Address = {{ .Client.Spec.Address }}
-const wgtypeTemplateSpec =
-	`[Interface]
+func (cfg *Config) String() string {
+	b, err := cfg.MarshalText()
+	if err != nil {
+		panic(err)
+	}
+	return string(b)
+}
+
+func (cfg *Config) MarshalText() (text []byte, err error) {
+	buff := &bytes.Buffer{}
+	if err := cfgTemplate.Execute(buff, cfg); err != nil {
+		return nil, err
+	}
+	return buff.Bytes(), nil
+}
+
+const wgtypeTemplateSpec = `[Interface]
 Address = {{ .Address }}
 PrivateKey = {{ .PrivateKey | wgKey }}
 {{- if .ListenPort }}{{ "\n" }}ListenPort = {{ .ListenPort }}{{ end }}
@@ -36,7 +50,7 @@ func serializeKey(key *wgtypes.Key) string {
 	return base64.StdEncoding.EncodeToString(key[:])
 }
 
-func parseKey(key string) (wgtypes.Key,error) {
+func parseKey(key string) (wgtypes.Key, error) {
 	var pkey wgtypes.Key
 	pkeySlice, err := base64.StdEncoding.DecodeString(key)
 	if err != nil {
@@ -53,22 +67,13 @@ var cfgTemplate = template.Must(
 		Funcs(template.FuncMap(map[string]interface{}{"wgKey": serializeKey})).
 		Parse(wgtypeTemplateSpec))
 
-
-func SerializeConfig(cfg *Config) (string, error) {
-	buff := &bytes.Buffer{}
-	if err := cfgTemplate.Execute(buff, cfg); err != nil {
-		return "", err
-	}
-	return buff.String(), nil
-}
-
 func commonPeerConfig(common v1alpha1.CommonSpec) (wgtypes.PeerConfig, error) {
 	srvKey, err := parseKey(common.PublicKey)
 
 	peer := wgtypes.PeerConfig{
-		ReplaceAllowedIPs:true,
-		PublicKey: srvKey,
-		AllowedIPs:make([]net.IPNet, 0, 1 + len(common.ExtraAllowedIPs)),
+		ReplaceAllowedIPs: true,
+		PublicKey:         srvKey,
+		AllowedIPs:        make([]net.IPNet, 0, 1+len(common.ExtraAllowedIPs)),
 	}
 
 	_, c, err := net.ParseCIDR(common.Address + "/32")
@@ -124,8 +129,8 @@ func ClientPeers(servers []v1alpha1.Client, skipClient string) ([]wgtypes.PeerCo
 
 type ClientRequest struct {
 	PrivateKey string
-	Client v1alpha1.Client
-	Servers v1alpha1.ServerList
+	Client     v1alpha1.Client
+	Servers    v1alpha1.ServerList
 }
 
 func CreateClientConfig(req ClientRequest) (*Config, error) {
@@ -141,9 +146,9 @@ func CreateClientConfig(req ClientRequest) (*Config, error) {
 	cfg := Config{
 		Address: net.ParseIP(req.Client.Spec.Address),
 		Config: wgtypes.Config{
-			PrivateKey: &key,
-			ReplacePeers:true,
-			Peers: peers,
+			PrivateKey:   &key,
+			ReplacePeers: true,
+			Peers:        peers,
 		},
 	}
 	if cfg.Address == nil {
@@ -155,9 +160,9 @@ func CreateClientConfig(req ClientRequest) (*Config, error) {
 
 type ServerRequest struct {
 	PrivateKey string
-	Me v1alpha1.Server
-	Clients v1alpha1.ClientList
-	Servers v1alpha1.ServerList
+	Me         v1alpha1.Server
+	Clients    v1alpha1.ClientList
+	Servers    v1alpha1.ServerList
 }
 
 func CreateServerConfig(req ServerRequest) (*Config, error) {
@@ -184,10 +189,10 @@ func CreateServerConfig(req ServerRequest) (*Config, error) {
 	cfg := Config{
 		Address: net.ParseIP(req.Me.Spec.Address),
 		Config: wgtypes.Config{
-			PrivateKey: &key,
-			ReplacePeers:true,
-			Peers: append(serverPeers, clientPeers...),
-			ListenPort: &ep.Port,
+			PrivateKey:   &key,
+			ReplacePeers: true,
+			Peers:        append(serverPeers, clientPeers...),
+			ListenPort:   &ep.Port,
 		},
 	}
 	if cfg.Address == nil {
@@ -195,4 +200,3 @@ func CreateServerConfig(req ServerRequest) (*Config, error) {
 	}
 	return &cfg, nil
 }
-
