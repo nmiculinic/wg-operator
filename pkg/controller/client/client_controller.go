@@ -74,7 +74,7 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 		log.Error(err, "Request.Namespace", request.Namespace, "Request.Name", request.Name)
 	}
 	for _, cl := range clients.Items {
-		log.Info("found client", "name", cl.Name, "pubKey", cl.Spec.PublicKey, "IPs", cl.Spec.AllowedIPs)
+		log.Info("found client", "name", cl.Name, "pubKey", cl.Spec.PublicKey)
 	}
 	return reconcile.Result{}, nil
 }

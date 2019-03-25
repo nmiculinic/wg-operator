@@ -10,12 +10,11 @@ go_build:
   variables:
     DOCKERVERSION: 18.09.3
   before_script:
-    - export GL_URL=$(echo $CI_PROJECT_URL | awk -F/ '{print $3}')
-    - export GO_PROJECT_PATH="$GOPATH/src/$GL_URL/$CI_PROJECT_NAMESPACE"
+    - export GO_PROJECT_PATH="$GOPATH/src/github.com/KrakenSystems/${CI_PROJECT_NAME}"
     - mkdir -p $GO_PROJECT_PATH
     - ln -s $(pwd) $GO_PROJECT_PATH
-    - export GO_PROJECT_PATH="$GO_PROJECT_PATH/$CI_PROJECT_NAME"
     - cd $GO_PROJECT_PATH
+    - pwd
     - go get github.com/golang/dep/cmd/dep  # Install dep
     - mkdir -p $GOPATH/src/github.com/operator-framework
     - cd $GOPATH/src/github.com/operator-framework
