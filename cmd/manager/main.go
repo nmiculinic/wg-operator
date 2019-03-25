@@ -25,7 +25,7 @@ import (
 // Change below variables to serve metrics on different host or port.
 var (
 	metricsHost       = "0.0.0.0"
-	metricsPort int32 = 8383
+	metricsPort int32 = 6060
 )
 var log = logf.Log.WithName("cmd")
 
