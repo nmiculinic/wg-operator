@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
-	"github.com/Masterminds/sprig"
 	"github.com/mdlayher/wireguardctrl/wgtypes"
 	"net"
 	"strings"
@@ -64,7 +63,6 @@ func parseKey(key string) (wgtypes.Key, error) {
 var cfgTemplate = template.Must(
 	template.
 		New("wg-cfg").
-		Funcs(sprig.HermeticTxtFuncMap()).
 		Funcs(template.FuncMap(map[string]interface{}{"wgKey": serializeKey})).
 		Parse(wgtypeTemplateSpec))
 
