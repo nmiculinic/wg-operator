@@ -96,7 +96,7 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
-	if err := cfg.Sync(r.wgSetup.InterfaceName, logrus.WithField("mode", "client")); err != nil {
+	if err := cfg.Sync(r.wgSetup.InterfaceName, logrus.WithField("mode", "server")); err != nil {
 		return reconcile.Result{}, err
 	}
 

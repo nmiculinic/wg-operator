@@ -339,11 +339,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:729751867ca614232cc1d2430e739d6de00546b8209496b18bf501e56e068c62"
+  digest = "1:529eaee8355af7e4a28a0bed8c0ee18ed044fa0ba1f8603c65822942314b4989"
   name = "github.com/nmiculinic/wg-quick-go"
   packages = ["."]
   pruneopts = "NT"
-  revision = "e9c9b6cf29afbd91d4ee98e3926e823f25cda07d"
+  revision = "d1fc1f2f2cd9c4de55f43d083110cd78e84f045e"
 
 [[projects]]
   branch = "master"
@@ -984,13 +984,13 @@
   analyzer-version = 1
   input-imports = [
     "github.com/go-openapi/spec",
-    "github.com/mdlayher/wireguardctrl",
     "github.com/mdlayher/wireguardctrl/wgtypes",
     "github.com/nmiculinic/wg-quick-go",
     "github.com/operator-framework/operator-sdk/pkg/k8sutil",
     "github.com/operator-framework/operator-sdk/pkg/log/zap",
     "github.com/operator-framework/operator-sdk/pkg/metrics",
     "github.com/operator-framework/operator-sdk/version",
+    "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",
     "github.com/stretchr/testify/assert",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
