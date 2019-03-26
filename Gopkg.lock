@@ -2,6 +2,30 @@
 
 
 [[projects]]
+  digest = "1:25870183293a3fb61cc9afd060a61d63a486f091db72af01a8ea3449f5ca530d"
+  name = "github.com/Masterminds/goutils"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "41ac8693c5c10a92ea1ff5ac3a7f95646f6123b0"
+  version = "v1.1.0"
+
+[[projects]]
+  digest = "1:a26f8da48b22e6176c1c6a2459904bb30bd0c49ada04b2963c2c3a203e81a620"
+  name = "github.com/Masterminds/semver"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "c7af12943936e8c39859482e61f0574c2fd7fc75"
+  version = "v1.4.2"
+
+[[projects]]
+  digest = "1:876a1121171c083c4e3a4789683d02a40c0f644c8190da521d15b59799f556d6"
+  name = "github.com/Masterminds/sprig"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "9f8fceff796fb9f4e992cd2bece016be0121ab74"
+  version = "2.19.0"
+
+[[projects]]
   digest = "1:0a111edd8693fd977f42a0c4f199a0efb13c20aec9da99ad8830c7bb6a87e8d6"
   name = "github.com/PuerkitoBio/purell"
   packages = ["."]
@@ -229,6 +253,14 @@
   version = "v0.5.1"
 
 [[projects]]
+  digest = "1:dc54242755f5b6721dd880843de6e45fe234838ea9149ec8249951880fd5802f"
+  name = "github.com/huandu/xstrings"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "f02667b379e2fb5916c3cda2cf31e0eb885d79f8"
+  version = "v1.2.0"
+
+[[projects]]
   digest = "1:aaa38889f11896ee3644d77e17dc7764cc47f5f3d3b488268df2af2b52541c5f"
   name = "github.com/imdario/mergo"
   packages = ["."]
@@ -279,6 +311,39 @@
   pruneopts = "NT"
   revision = "c12348ce28de40eed0136aa2b644d0ee0650e56c"
   version = "v1.0.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:80d76b821ec64bd759ee0b073ba7e22af7e3a5fdbf5f2f8d99c9c1bd819c9c15"
+  name = "github.com/mdlayher/genetlink"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "60417448a85124f4b675580ad4186e8776b27d91"
+
+[[projects]]
+  branch = "master"
+  digest = "1:ace99ee36754fa463aafc7f478fe3044a15d682cf8d6322e64986bb11f4d3f50"
+  name = "github.com/mdlayher/netlink"
+  packages = [
+    ".",
+    "nlenc",
+  ]
+  pruneopts = "NT"
+  revision = "258ea9dff42c0ec7540aa4b1599d09e7bfc7973b"
+
+[[projects]]
+  branch = "master"
+  digest = "1:9c9f15073355800995929295df4e2a531853b440c33e8de64a237d36c619b561"
+  name = "github.com/mdlayher/wireguardctrl"
+  packages = [
+    ".",
+    "internal/wgnl",
+    "internal/wgnl/internal/wgh",
+    "internal/wguser",
+    "wgtypes",
+  ]
+  pruneopts = "NT"
+  revision = "8a114cef8e8721c2f0f9072fd3e57444e1a02777"
 
 [[projects]]
   digest = "1:2f42fa12d6911c7b7659738758631bec870b7e9b4c6be5444f963cdcfccc191f"
@@ -435,6 +500,25 @@
   version = "v1.3.0"
 
 [[projects]]
+  digest = "1:936ab0fd3f16edc83131e626594a4f4e75426e5adeb7adbe57ed203db4c1b950"
+  name = "github.com/vishvananda/netlink"
+  packages = [
+    ".",
+    "nl",
+  ]
+  pruneopts = "NT"
+  revision = "a2ad57a690f3caf3015351d2d6e1c0b95c349752"
+  version = "v1.0.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:2a1bbe57bb2602803e0f142d88453b0d9fec89e496aaa2cd8807bcae2e05a4a7"
+  name = "github.com/vishvananda/netns"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "13995c7128ccc8e51e9a6bd2b551020a27180abd"
+
+[[projects]]
   digest = "1:22f696cee54865fb8e9ff91df7b633f6b8f22037a8015253c6b6a71ca82219c7"
   name = "go.uber.org/atomic"
   packages = ["."]
@@ -469,7 +553,12 @@
   branch = "master"
   digest = "1:36842fdff18922e24986fdb929c44eaa322860ad3f5eb5936ce91ceda3da124f"
   name = "golang.org/x/crypto"
-  packages = ["ssh/terminal"]
+  packages = [
+    "curve25519",
+    "pbkdf2",
+    "scrypt",
+    "ssh/terminal",
+  ]
   pruneopts = "NT"
   revision = "8dd112bcdc25174059e45e07517d9fc663123347"
 
@@ -478,6 +567,7 @@
   digest = "1:2aba4494bdd4f05b0d931d6f31f77cef5d7854e9d1f4ae29a7813d694d1fd27c"
   name = "golang.org/x/net"
   packages = [
+    "bpf",
     "context",
     "context/ctxhttp",
     "http/httpguts",
@@ -904,14 +994,17 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/Masterminds/sprig",
     "github.com/go-openapi/spec",
+    "github.com/mdlayher/wireguardctrl",
+    "github.com/mdlayher/wireguardctrl/wgtypes",
     "github.com/operator-framework/operator-sdk/pkg/k8sutil",
     "github.com/operator-framework/operator-sdk/pkg/log/zap",
     "github.com/operator-framework/operator-sdk/pkg/metrics",
     "github.com/operator-framework/operator-sdk/version",
     "github.com/spf13/pflag",
     "github.com/stretchr/testify/assert",
-    "k8s.io/api/core/v1",
+    "github.com/vishvananda/netlink",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/runtime/schema",
@@ -927,6 +1020,7 @@
     "sigs.k8s.io/controller-runtime/pkg/client",
     "sigs.k8s.io/controller-runtime/pkg/client/config",
     "sigs.k8s.io/controller-runtime/pkg/controller",
+    "sigs.k8s.io/controller-runtime/pkg/event",
     "sigs.k8s.io/controller-runtime/pkg/handler",
     "sigs.k8s.io/controller-runtime/pkg/manager",
     "sigs.k8s.io/controller-runtime/pkg/reconcile",

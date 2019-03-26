@@ -1,6 +1,0 @@
-apiVersion: wg.krakensystems.co/v1alpha1
-kind: Client
-metadata:
-  name: example-client
-spec:
-  publicKey: "CLIENT_PUB_KEY"

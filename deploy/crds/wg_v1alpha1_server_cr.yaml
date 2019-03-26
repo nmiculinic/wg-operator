@@ -1,6 +1,0 @@
-apiVersion: wg.krakensystems.co/v1alpha1
-kind: Server
-metadata:
-  name: example-server
-spec:
-  publicKey: "SERVER_PUB_KEY"

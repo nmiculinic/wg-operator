@@ -15,7 +15,7 @@ type ServerSpec struct {
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	CommonSpec `json:",inline"`
-	Endpoint string `json:"endpoint"`
+	Endpoint   string `json:"endpoint"`
 }
 
 // ServerStatus defines the observed state of Server

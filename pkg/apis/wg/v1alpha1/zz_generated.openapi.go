@@ -96,14 +96,8 @@ func schema_pkg_apis_wg_v1alpha1_ClientSpec(ref common.ReferenceCallback) common
 							},
 						},
 					},
-					"listenPort": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"integer"},
-							Format: "int32",
-						},
-					},
 				},
-				Required: []string{"publicKey", "address", "extraAllowedIPs", "listenPort"},
+				Required: []string{"publicKey", "address", "extraAllowedIPs"},
 			},
 		},
 		Dependencies: []string{},
@@ -196,12 +190,6 @@ func schema_pkg_apis_wg_v1alpha1_ServerSpec(ref common.ReferenceCallback) common
 							},
 						},
 					},
-					"listenPort": {
-						SchemaProps: spec.SchemaProps{
-							Type:   []string{"integer"},
-							Format: "int32",
-						},
-					},
 					"endpoint": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
@@ -209,7 +197,7 @@ func schema_pkg_apis_wg_v1alpha1_ServerSpec(ref common.ReferenceCallback) common
 						},
 					},
 				},
-				Required: []string{"publicKey", "address", "extraAllowedIPs", "listenPort", "endpoint"},
+				Required: []string{"publicKey", "address", "extraAllowedIPs", "endpoint"},
 			},
 		},
 		Dependencies: []string{},

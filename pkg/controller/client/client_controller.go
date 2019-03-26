@@ -2,8 +2,9 @@ package client
 
 import (
 	"context"
+	"fmt"
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
-
+	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -16,32 +17,22 @@ import (
 
 var log = logf.Log.WithName("controller_client")
 
-/**
-* USER ACTION REQUIRED: This is a scaffold file intended for the user to modify with their own Controller
-* business logic.  Delete these comments after modifying this file.*
- */
-
 // Add creates a new Client Controller and adds it to the Manager. The Manager will set fields on the Controller
 // and Start it when the Manager is Started.
-func Add(mgr manager.Manager) error {
-	return add(mgr, newReconciler(mgr))
-}
+func Add(mgr manager.Manager, setup *wgctl.WireguardSetup) error {
+	r := &ReconcileClient{
+		client:  mgr.GetClient(),
+		scheme:  mgr.GetScheme(),
+		wgSetup: setup,
+	}
 
-// newReconciler returns a new reconcile.Reconciler
-func newReconciler(mgr manager.Manager) reconcile.Reconciler {
-	return &ReconcileClient{client: mgr.GetClient(), scheme: mgr.GetScheme()}
-}
-
-// add adds a new Controller to mgr with r as the reconcile.Reconciler
-func add(mgr manager.Manager, r reconcile.Reconciler) error {
 	// Create a new controller
 	c, err := controller.New("client-controller", mgr, controller.Options{Reconciler: r})
 	if err != nil {
 		return err
 	}
 
-	// TODO: only watch with specific name!
-	err = c.Watch(&source.Kind{Type: &wgv1alpha1.Client{}}, &handler.EnqueueRequestForObject{})
+	err = c.Watch(&source.Kind{Type: &wgv1alpha1.Client{}}, &handler.EnqueueRequestForObject{}, setup)
 	if err != nil {
 		return err
 	}
@@ -60,8 +51,9 @@ var _ reconcile.Reconciler = &ReconcileClient{}
 type ReconcileClient struct {
 	// This client, initialized using mgr.Client() above, is a split client
 	// that reads objects from the cache and writes to the apiserver
-	client client.Client
-	scheme *runtime.Scheme
+	client  client.Client
+	scheme  *runtime.Scheme
+	wgSetup *wgctl.WireguardSetup
 }
 
 func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result, error) {
@@ -69,13 +61,36 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 	reqLogger.Info("Reconciling Client")
 	ctx := context.Background()
 
-	clients := &wgv1alpha1.ClientList{}
-	if err := r.client.List(ctx, &client.ListOptions{Namespace:request.Namespace}, clients); err != nil {
-		log.Error(err, "Request.Namespace", request.Namespace, "Request.Name", request.Name)
+	wgClient := &wgv1alpha1.Client{}
+	if err := r.client.Get(ctx, client.ObjectKey{Name: r.wgSetup.NodeName, Namespace: request.Namespace}, wgClient); err != nil {
+		log.Error(err, "cannot find client", "Namespace", request.Namespace, "Name", r.wgSetup.NodeName)
+		return reconcile.Result{}, err
 	}
-	for _, cl := range clients.Items {
-		log.Info("found client", "name", cl.Name, "pubKey", cl.Spec.PublicKey)
+
+	servers := &wgv1alpha1.ServerList{}
+	if err := r.client.List(ctx, &client.ListOptions{Namespace: request.Namespace}, servers); err != nil {
+		log.Error(err, "cannot list all servers", "Request.Namespace", request.Namespace)
+		return reconcile.Result{}, err
+	}
+
+	cfg, err := wgctl.CreateClientConfig(wgctl.ClientRequest{
+		PrivateKey: "AAAA",
+		Client:     *wgClient,
+		Servers:    *servers,
+	})
+	if err != nil {
+		return reconcile.Result{}, err
+	}
+
+	reqLogger.Info(fmt.Sprintf("about to apply config:\n%s", cfg.String()), "interface", r.wgSetup.InterfaceName)
+	if err := r.wgSetup.SetPrivateKey(cfg); err != nil {
+		reqLogger.Error(err, "cannot read private key file", "file", r.wgSetup.PrivateKeyFile)
+		return reconcile.Result{}, err
+	}
+
+	reqLogger.Info("loaded private key file", "file", r.wgSetup.PrivateKeyFile)
+	if err := r.wgSetup.SyncConfigToMachine(cfg); err != nil {
+		return reconcile.Result{}, err
 	}
 	return reconcile.Result{}, nil
 }
-
