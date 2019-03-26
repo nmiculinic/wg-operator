@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
@@ -91,10 +92,11 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
-	reqLogger.Info(fmt.Sprintf("about to apply config:\n%s", cfg.String()), "interface", r.wgSetup.InterfaceName)
+	reqLogger.Info(fmt.Sprintf("about to apply config:\n%s", cfg.String()), "iface", r.wgSetup.InterfaceName)
 	if err := r.wgSetup.SetPrivateKey(cfg); err != nil {
 		return reconcile.Result{}, err
 	}
+	reqLogger.Info("read private key", "public key", base64.StdEncoding.EncodeToString(cfg.PrivateKey.PublicKey()[:]))
 
 	if err := cfg.Sync(r.wgSetup.InterfaceName, logrus.WithField("mode", "server")); err != nil {
 		return reconcile.Result{}, err

@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/base64"
 	"fmt"
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
@@ -88,7 +89,7 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 		reqLogger.Error(err, "cannot read private key file", "file", r.wgSetup.PrivateKeyFile)
 		return reconcile.Result{}, err
 	}
-
+	reqLogger.Info("read private key", "public key", base64.StdEncoding.EncodeToString(cfg.PrivateKey.PublicKey()[:]))
 	reqLogger.Info("loaded private key file", "file", r.wgSetup.PrivateKeyFile)
 	if err := cfg.Sync(r.wgSetup.InterfaceName, logrus.WithField("mode", "client")); err != nil {
 		return reconcile.Result{}, err
