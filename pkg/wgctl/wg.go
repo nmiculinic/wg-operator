@@ -5,6 +5,7 @@ import (
 	"github.com/mdlayher/wireguardctrl"
 	"github.com/vishvananda/netlink"
 	"io/ioutil"
+	"net"
 	"os/exec"
 	"sigs.k8s.io/controller-runtime/pkg/event"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -94,20 +95,21 @@ func (n *WireguardSetup) syncAddress(link netlink.Link, cfg *Config) error {
 
 	presentAddresses := make(map[string]int, 0)
 	for _, addr := range addrs {
-		presentAddresses[addr.IP.String()] = 1
+		presentAddresses[addr.IPNet.String()] = 1
 	}
 
-	for _, addr := range []string{cfg.Address.String()} {
-		_, present := presentAddresses[addr]
-		presentAddresses[cfg.Address.String()] = 2
+	for _, addr := range []*net.IPNet{cfg.Address} {
+		_, present := presentAddresses[addr.String()]
+		presentAddresses[addr.String()] = 2
 		if present {
 			log.Info("address present", "addr", addr, "iface", link.Attrs().Name)
 			continue
 		}
 
-		cmd := exec.Command("ip", "addr", "add", "dev", n.InterfaceName, addr+"/32")
-		if stdoutStderr, err := cmd.CombinedOutput(); err != nil {
-			log.Error(err, "cannot delete addr", "iface", n.InterfaceName, "args", fmt.Sprint(cmd.Args), "output", string(stdoutStderr))
+		if err := netlink.AddrAdd(link, &netlink.Addr{
+			IPNet: addr,
+		}); err != nil {
+			log.Error(err, "cannot add addr", "iface", n.InterfaceName)
 			return err
 		}
 		log.Info("address added", "addr", addr, "iface", link.Attrs().Name)
@@ -115,12 +117,16 @@ func (n *WireguardSetup) syncAddress(link netlink.Link, cfg *Config) error {
 
 	for addr, p := range presentAddresses {
 		if p < 2 {
-			log.Info("extra manual address found", "iface", n.InterfaceName, "addr", addr)
-			cmd := exec.Command("ip", "addr", "del", "dev", n.InterfaceName, addr)
-			if stdoutStderr, err := cmd.CombinedOutput(); err != nil {
-				log.Error(err, "cannot delete addr", "iface", n.InterfaceName, "args", fmt.Sprint(cmd.Args), "output", string(stdoutStderr))
+			nlAddr, err := netlink.ParseAddr(addr)
+			if err != nil {
+				log.Error(err, "cannot parse del addr", "iface", n.InterfaceName, "addr", addr)
 				return err
 			}
+			if err := netlink.AddrAdd(link, nlAddr); err != nil {
+				log.Error(err, "cannot delete addr", "iface", n.InterfaceName, "addr", addr)
+				return err
+			}
+			log.Info("address deleted", "addr", addr, "iface", link.Attrs().Name)
 		}
 	}
 	return nil
