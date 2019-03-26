@@ -96,7 +96,9 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 	if err := r.wgSetup.SetPrivateKey(cfg); err != nil {
 		return reconcile.Result{}, err
 	}
-	reqLogger.Info("read private key", "public key", base64.StdEncoding.EncodeToString(cfg.PrivateKey.PublicKey()[:]))
+
+	pub := cfg.PrivateKey.PublicKey()
+	reqLogger.Info("read private key", "public key", base64.StdEncoding.EncodeToString(pub[:]))
 
 	if err := cfg.Sync(r.wgSetup.InterfaceName, logrus.WithField("mode", "server")); err != nil {
 		return reconcile.Result{}, err
