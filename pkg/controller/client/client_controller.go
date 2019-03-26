@@ -5,6 +5,7 @@ import (
 	"fmt"
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
+	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -89,7 +90,7 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 	}
 
 	reqLogger.Info("loaded private key file", "file", r.wgSetup.PrivateKeyFile)
-	if err := r.wgSetup.SyncConfigToMachine(cfg); err != nil {
+	if err := cfg.Sync(r.wgSetup.InterfaceName, logrus.WithField("mode", "client")); err != nil {
 		return reconcile.Result{}, err
 	}
 	return reconcile.Result{}, nil

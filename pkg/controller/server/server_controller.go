@@ -5,6 +5,7 @@ import (
 	"fmt"
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
+	"github.com/sirupsen/logrus"
 
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -95,7 +96,7 @@ func (r *ReconcileClient) Reconcile(request reconcile.Request) (reconcile.Result
 		return reconcile.Result{}, err
 	}
 
-	if err := r.wgSetup.Client.ConfigureDevice(r.wgSetup.InterfaceName, cfg.Config); err != nil {
+	if err := cfg.Sync(r.wgSetup.InterfaceName, logrus.WithField("mode", "client")); err != nil {
 		return reconcile.Result{}, err
 	}
 

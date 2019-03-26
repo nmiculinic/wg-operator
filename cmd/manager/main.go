@@ -6,7 +6,6 @@ import (
 	"github.com/KrakenSystems/wg-operator/pkg/controller/client"
 	"github.com/KrakenSystems/wg-operator/pkg/controller/server"
 	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
-	"github.com/mdlayher/wireguardctrl"
 	"os"
 	"runtime"
 
@@ -97,17 +96,11 @@ func main() {
 		log.Error(err, "")
 		os.Exit(1)
 	}
-	cl, err := wireguardctrl.New()
-	if err != nil {
-		log.Error(err, "cannot setup wireguard device")
-		os.Exit(3)
-	}
 
 	wg := &wgctl.WireguardSetup{
 		NodeName:       *nodeName,
 		InterfaceName:  *interfaceName,
 		PrivateKeyFile: *privateKeyFile,
-		Client:         cl,
 	}
 	switch *mode {
 	case "client":
