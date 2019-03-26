@@ -34,19 +34,6 @@
   revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
 
 [[projects]]
-  digest = "1:c61f4f97321a37adcb5b4fd4fd61209cd553e46c99ee606c465553541b12a229"
-  name = "github.com/coreos/prometheus-operator"
-  packages = [
-    "pkg/apis/monitoring",
-    "pkg/apis/monitoring/v1",
-    "pkg/client/versioned/scheme",
-    "pkg/client/versioned/typed/monitoring/v1",
-  ]
-  pruneopts = "NT"
-  revision = "72ec4b9b16ef11700724dc71fec77112536eed40"
-  version = "v0.26.0"
-
-[[projects]]
   digest = "1:4b8b5811da6970495e04d1f4e98bb89518cc3cfc3b3f456bdb876ed7b6c74049"
   name = "github.com/davecgh/go-spew"
   packages = ["spew"]
@@ -339,11 +326,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:529eaee8355af7e4a28a0bed8c0ee18ed044fa0ba1f8603c65822942314b4989"
+  digest = "1:008e9b63a14e9070d0af9c145d2ba0720636dbac66d2bcb4bfdaf09a93ae14ce"
   name = "github.com/nmiculinic/wg-quick-go"
   packages = ["."]
   pruneopts = "NT"
-  revision = "d1fc1f2f2cd9c4de55f43d083110cd78e84f045e"
+  revision = "c5eb6a3cfaf73895dc1f1874fcb5b8ccf66508ad"
 
 [[projects]]
   branch = "master"
@@ -351,8 +338,6 @@
   name = "github.com/operator-framework/operator-sdk"
   packages = [
     "pkg/k8sutil",
-    "pkg/log/zap",
-    "pkg/metrics",
     "version",
   ]
   pruneopts = "NT"
@@ -983,12 +968,11 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
+    "github.com/go-logr/logr",
     "github.com/go-openapi/spec",
     "github.com/mdlayher/wireguardctrl/wgtypes",
     "github.com/nmiculinic/wg-quick-go",
     "github.com/operator-framework/operator-sdk/pkg/k8sutil",
-    "github.com/operator-framework/operator-sdk/pkg/log/zap",
-    "github.com/operator-framework/operator-sdk/pkg/metrics",
     "github.com/operator-framework/operator-sdk/version",
     "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",

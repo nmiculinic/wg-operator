@@ -6,12 +6,13 @@ import (
 	"github.com/KrakenSystems/wg-operator/pkg/controller/client"
 	"github.com/KrakenSystems/wg-operator/pkg/controller/server"
 	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
+	"github.com/go-logr/logr"
+	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
 
 	"github.com/KrakenSystems/wg-operator/pkg/apis"
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
-	"github.com/operator-framework/operator-sdk/pkg/log/zap"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/spf13/pflag"
 	// _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -34,15 +35,45 @@ func printVersion() {
 	log.Info(fmt.Sprintf("Version of operator-sdk: %v", sdkVersion.Version))
 }
 
+type logrusLogf struct {
+	logger logrus.FieldLogger
+}
+
+func (l logrusLogf) Info(msg string, keysAndValues ...interface{}) {
+	l.WithValues(keysAndValues...).(logrusLogf).logger.Info(msg)
+}
+
+func (l logrusLogf) Enabled() bool {
+	return true
+}
+
+func (l logrusLogf) Error(err error, msg string, keysAndValues ...interface{}) {
+	o := l.WithValues(keysAndValues...).(logrusLogf)
+	o.logger.WithError(err).Error(msg)
+}
+
+func (l logrusLogf) V(level int) logr.InfoLogger {
+	return l
+}
+
+func (l logrusLogf) WithValues(keysAndValues ...interface{}) logr.Logger {
+	olog := l.logger
+	for i := 0; i < len(keysAndValues); i+=2 {
+		olog = olog.WithField(fmt.Sprint(keysAndValues[i]), keysAndValues[i + 1])
+	}
+	return logrusLogf{olog}
+}
+
+func (l logrusLogf) WithName(name string) logr.Logger {
+	return logrusLogf{l.logger.WithField("name", name)}
+}
+
 func main() {
 	hostname, err := os.Hostname()
 	if err != nil {
 		log.Error(err, "cannot retrieve hostname")
 		os.Exit(2)
 	}
-	// Add the zap logger flag set to the CLI. The flag set must
-	// be added before calling pflag.Parse().
-	pflag.CommandLine.AddFlagSet(zap.FlagSet())
 
 	// Add flags registered by imported packages (e.g. glog and
 	// controller-runtime)
@@ -54,15 +85,8 @@ func main() {
 
 	pflag.Parse()
 
-	// Use a zap logr.Logger implementation. If none of the zap
-	// flags are configured (or if the zap flag set is not being
-	// used), this defaults to a production zap logger.
-	//
-	// The logger instantiated here can be changed to any logger
-	// implementing the logr.Logger interface. This logger will
-	// be propagated through the whole operator, generating
-	// uniform and structured logs.
-	logf.SetLogger(zap.Logger())
+	logf.SetLogger(logrusLogf{logrus.WithField("name", "wg-operator")})
+	logrus.SetLevel(logrus.TraceLevel)
 
 	printVersion()
 
