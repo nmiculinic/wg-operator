@@ -11,10 +11,12 @@ go_build:
     DOCKERVERSION: 18.09.3
   before_script:
     - export GO_PROJECT_PATH="$GOPATH/src/github.com/KrakenSystems/${CI_PROJECT_NAME}"
+    - echo $GO_PROJECT_PATH
     - mkdir -p $GO_PROJECT_PATH
     - ln -s $(pwd) $GO_PROJECT_PATH
     - cd $GO_PROJECT_PATH
     - pwd
+    - ls
     - go get github.com/golang/dep/cmd/dep  # Install dep
     - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
@@ -65,8 +67,7 @@ go_build:
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-arm64v8 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-arm64v8
-    - docker push ${IMAGE_FULL}
-    - docker push ${IMAGE_BRANCH}
+    - echo "manifest magic"
   artifacts:
     paths:
       - build/
