@@ -10,10 +10,10 @@ go_build:
   variables:
     DOCKERVERSION: 18.09.3
   before_script:
+    - mkdir -p $GOPATH/src/github.com/KrakenSystems/
     - export GO_PROJECT_PATH="$GOPATH/src/github.com/KrakenSystems/${CI_PROJECT_NAME}"
     - echo $GO_PROJECT_PATH
-    - mkdir -p $GO_PROJECT_PATH
-    - ln -s $(pwd) $GO_PROJECT_PATH
+    - ln -s $GO_PROJECT_PATH $(pwd)
     - cd $GO_PROJECT_PATH
     - pwd
     - ls
