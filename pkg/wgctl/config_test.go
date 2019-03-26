@@ -86,7 +86,7 @@ func TestClient(t *testing.T) {
 				Client:     cl1,
 			},
 			targetConfig: `[Interface]
-Address = 10.100.0.1
+Address = 10.100.0.1/32
 PrivateKey = QBNloaEPjZd/nafQcH55kdYqnQ6YB6gX35l//QGra2E=
 `,
 		},
@@ -98,7 +98,7 @@ PrivateKey = QBNloaEPjZd/nafQcH55kdYqnQ6YB6gX35l//QGra2E=
 				Client:     cl1,
 			},
 			targetConfig: `[Interface]
-Address = 10.100.0.1
+Address = 10.100.0.1/32
 PrivateKey = QBNloaEPjZd/nafQcH55kdYqnQ6YB6gX35l//QGra2E=
 
 [Peer]
@@ -114,7 +114,7 @@ Endpoint = 35.12.23.34:555
 				Client:     cl1,
 			},
 			targetConfig: `[Interface]
-Address = 10.100.0.1
+Address = 10.100.0.1/32
 PrivateKey = QBNloaEPjZd/nafQcH55kdYqnQ6YB6gX35l//QGra2E=
 
 [Peer]
@@ -135,7 +135,7 @@ Endpoint = 55.12.23.34:123
 				Client:     cl1,
 			},
 			targetConfig: `[Interface]
-Address = 10.100.0.1
+Address = 10.100.0.1/32
 PrivateKey = QBNloaEPjZd/nafQcH55kdYqnQ6YB6gX35l//QGra2E=
 
 [Peer]
@@ -188,7 +188,7 @@ func TestServer(t *testing.T) {
 				Clients:    v1alpha1.ClientList{},
 			},
 			targetConfig: `[Interface]
-Address = 10.100.2.1
+Address = 10.100.2.1/32
 PrivateKey = QBNloaEPjZd/nafQcH55kdYqnQ6YB6gX35l//QGra2E=
 ListenPort = 123
 `,
@@ -202,7 +202,7 @@ ListenPort = 123
 				Clients:    v1alpha1.ClientList{Items: []v1alpha1.Client{cl1, cl2}},
 			},
 			targetConfig: `[Interface]
-Address = 10.100.2.1
+Address = 10.100.2.1/32
 PrivateKey = QBNloaEPjZd/nafQcH55kdYqnQ6YB6gX35l//QGra2E=
 ListenPort = 123
 

@@ -104,6 +104,7 @@ func (n *WireguardSetup) syncAddress(link netlink.Link, cfg *Config) error {
 			log.Info("address present", "addr", addr, "iface", link.Attrs().Name)
 			continue
 		}
+
 		cmd := exec.Command("ip", "addr", "add", "dev", n.InterfaceName, addr+"/32")
 		if stdoutStderr, err := cmd.CombinedOutput(); err != nil {
 			log.Error(err, "cannot delete addr", "iface", n.InterfaceName, "args", fmt.Sprint(cmd.Args), "output", string(stdoutStderr))
@@ -112,7 +113,6 @@ func (n *WireguardSetup) syncAddress(link netlink.Link, cfg *Config) error {
 		log.Info("address added", "addr", addr, "iface", link.Attrs().Name)
 	}
 
-	// Clean extra routes
 	for addr, p := range presentAddresses {
 		if p < 2 {
 			log.Info("extra manual address found", "iface", n.InterfaceName, "addr", addr)
