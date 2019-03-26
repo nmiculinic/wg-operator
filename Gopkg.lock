@@ -2,30 +2,6 @@
 
 
 [[projects]]
-  digest = "1:25870183293a3fb61cc9afd060a61d63a486f091db72af01a8ea3449f5ca530d"
-  name = "github.com/Masterminds/goutils"
-  packages = ["."]
-  pruneopts = "NT"
-  revision = "41ac8693c5c10a92ea1ff5ac3a7f95646f6123b0"
-  version = "v1.1.0"
-
-[[projects]]
-  digest = "1:a26f8da48b22e6176c1c6a2459904bb30bd0c49ada04b2963c2c3a203e81a620"
-  name = "github.com/Masterminds/semver"
-  packages = ["."]
-  pruneopts = "NT"
-  revision = "c7af12943936e8c39859482e61f0574c2fd7fc75"
-  version = "v1.4.2"
-
-[[projects]]
-  digest = "1:876a1121171c083c4e3a4789683d02a40c0f644c8190da521d15b59799f556d6"
-  name = "github.com/Masterminds/sprig"
-  packages = ["."]
-  pruneopts = "NT"
-  revision = "9f8fceff796fb9f4e992cd2bece016be0121ab74"
-  version = "2.19.0"
-
-[[projects]]
   digest = "1:0a111edd8693fd977f42a0c4f199a0efb13c20aec9da99ad8830c7bb6a87e8d6"
   name = "github.com/PuerkitoBio/purell"
   packages = ["."]
@@ -253,14 +229,6 @@
   version = "v0.5.1"
 
 [[projects]]
-  digest = "1:dc54242755f5b6721dd880843de6e45fe234838ea9149ec8249951880fd5802f"
-  name = "github.com/huandu/xstrings"
-  packages = ["."]
-  pruneopts = "NT"
-  revision = "f02667b379e2fb5916c3cda2cf31e0eb885d79f8"
-  version = "v1.2.0"
-
-[[projects]]
   digest = "1:aaa38889f11896ee3644d77e17dc7764cc47f5f3d3b488268df2af2b52541c5f"
   name = "github.com/imdario/mergo"
   packages = ["."]
@@ -283,6 +251,14 @@
   pruneopts = "NT"
   revision = "1624edc4454b8682399def8740d46db5e4362ba4"
   version = "v1.1.5"
+
+[[projects]]
+  digest = "1:58999a98719fddbac6303cb17e8d85b945f60b72f48e3a2df6b950b97fa926f1"
+  name = "github.com/konsorten/go-windows-terminal-sequences"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "f55edac94c9bbba5d6182a4be46d86a2c9b5b50e"
+  version = "v1.0.2"
 
 [[projects]]
   branch = "master"
@@ -360,6 +336,14 @@
   pruneopts = "NT"
   revision = "4b7aa43c6742a2c18fdef89dd197aaae7dac7ccd"
   version = "1.0.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:673ddf1efac6cc70d6889fa46241ebc4c4e650af5b3e9c215dff243b76cf2aff"
+  name = "github.com/nmiculinic/wg-quick-go"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "d354485a2927dcd295bb6be0d5d8a3aa1d0ebfe5"
 
 [[projects]]
   branch = "master"
@@ -473,6 +457,14 @@
   version = "v1.2.2"
 
 [[projects]]
+  digest = "1:c8a0dfc6208c2af75549dbd7a0c4446cc214b7a049a872858a8ec6f58e4fd082"
+  name = "github.com/sirupsen/logrus"
+  packages = ["."]
+  pruneopts = "NT"
+  revision = "dae0fa8d5b0c810a8ab733fbd5510c7cae84eca4"
+  version = "v1.4.0"
+
+[[projects]]
   digest = "1:1bc08ec221c4fb25e6f2c019b23fe989fb44573c696983d8e403a3b76cc378e1"
   name = "github.com/spf13/afero"
   packages = [
@@ -555,8 +547,6 @@
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
-    "pbkdf2",
-    "scrypt",
     "ssh/terminal",
   ]
   pruneopts = "NT"
@@ -994,10 +984,10 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/Masterminds/sprig",
     "github.com/go-openapi/spec",
     "github.com/mdlayher/wireguardctrl",
     "github.com/mdlayher/wireguardctrl/wgtypes",
+    "github.com/nmiculinic/wg-quick-go",
     "github.com/operator-framework/operator-sdk/pkg/k8sutil",
     "github.com/operator-framework/operator-sdk/pkg/log/zap",
     "github.com/operator-framework/operator-sdk/pkg/metrics",

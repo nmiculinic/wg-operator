@@ -1,74 +1,15 @@
 package wgctl
 
 import (
-	"bytes"
-	"encoding/base64"
-	"fmt"
 	"github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 	"github.com/mdlayher/wireguardctrl/wgtypes"
+	"github.com/nmiculinic/wg-quick-go"
 	"net"
 	"strings"
-	"text/template"
 )
 
-type Config struct {
-	wgtypes.Config
-	Address *net.IPNet
-}
-
-func (cfg *Config) String() string {
-	b, err := cfg.MarshalText()
-	if err != nil {
-		panic(err)
-	}
-	return string(b)
-}
-
-func (cfg *Config) MarshalText() (text []byte, err error) {
-	buff := &bytes.Buffer{}
-	if err := cfgTemplate.Execute(buff, cfg); err != nil {
-		return nil, err
-	}
-	return buff.Bytes(), nil
-}
-
-const wgtypeTemplateSpec = `[Interface]
-Address = {{ .Address }}
-PrivateKey = {{ .PrivateKey | wgKey }}
-{{- if .ListenPort }}{{ "\n" }}ListenPort = {{ .ListenPort }}{{ end }}
-{{- range .Peers }}
-
-[Peer]
-PublicKey = {{ .PublicKey | wgKey }}
-AllowedIps = {{ range $i, $el := .AllowedIPs }}{{if $i}}, {{ end }}{{ $el }}{{ end }}
-{{- if .Endpoint }}{{ "\n" }}Endpoint = {{ .Endpoint }}{{ end }}
-
-{{- end }}
-`
-
-func serializeKey(key *wgtypes.Key) string {
-	return base64.StdEncoding.EncodeToString(key[:])
-}
-
-func parseKey(key string) (wgtypes.Key, error) {
-	var pkey wgtypes.Key
-	pkeySlice, err := base64.StdEncoding.DecodeString(key)
-	if err != nil {
-		return pkey, err
-	}
-	copy(pkey[:], pkeySlice[:])
-	return pkey, nil
-}
-
-var cfgTemplate = template.Must(
-	template.
-		New("wg-cfg").
-		Funcs(template.FuncMap(map[string]interface{}{"wgKey": serializeKey})).
-		Parse(wgtypeTemplateSpec))
-
 func commonPeerConfig(common v1alpha1.CommonSpec) (wgtypes.PeerConfig, error) {
-	srvKey, err := parseKey(common.PublicKey)
-
+	srvKey, err := wgctl.ParseKey(common.PublicKey)
 	peer := wgtypes.PeerConfig{
 		ReplaceAllowedIPs: true,
 		PublicKey:         srvKey,
@@ -132,8 +73,8 @@ type ClientRequest struct {
 	Servers    v1alpha1.ServerList
 }
 
-func CreateClientConfig(req ClientRequest) (*Config, error) {
-	key, err := parseKey(req.PrivateKey)
+func CreateClientConfig(req ClientRequest) (*wgctl.Config, error) {
+	key, err := wgctl.ParseKey(req.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -155,8 +96,8 @@ func CreateClientConfig(req ClientRequest) (*Config, error) {
 			return nil, err
 		}
 	}
-	cfg := Config{
-		Address: ip,
+	cfg := wgctl.Config{
+		Address: []*net.IPNet{ip},
 		Config: wgtypes.Config{
 			PrivateKey:   &key,
 			ReplacePeers: true,
@@ -174,8 +115,8 @@ type ServerRequest struct {
 	Servers    v1alpha1.ServerList
 }
 
-func CreateServerConfig(req ServerRequest) (*Config, error) {
-	key, err := parseKey(req.PrivateKey)
+func CreateServerConfig(req ServerRequest) (*wgctl.Config, error) {
+	key, err := wgctl.ParseKey(req.PrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -208,17 +149,14 @@ func CreateServerConfig(req ServerRequest) (*Config, error) {
 		}
 	}
 
-	cfg := Config{
-		Address: ip,
+	cfg := wgctl.Config{
+		Address: []*net.IPNet{ip},
 		Config: wgtypes.Config{
 			PrivateKey:   &key,
 			ReplacePeers: true,
 			Peers:        append(serverPeers, clientPeers...),
 			ListenPort:   &ep.Port,
 		},
-	}
-	if cfg.Address == nil {
-		return nil, fmt.Errorf("cannot parse IP %v", req.Me.Spec.Address)
 	}
 	return &cfg, nil
 }
