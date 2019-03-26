@@ -44,17 +44,17 @@ go_build:
     - docker build -t ${IMAGE_FULL}-amd64 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-amd64
     - echo "========="
-    - GOOS=linux GOARCH=amd GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-amd7 ./cmd/manager
+    - GOOS=linux GOARCH=amd GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm32v7 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm32v7/alpine
       WORKDIR /bin
-      COPY build/${CI_PROJECT_PATH}-arm7 /bin/${CI_PROJECT_PATH}
+      COPY build/${CI_PROJECT_PATH}-arm32v7 /bin/${CI_PROJECT_PATH}
       ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
       EOF
     - cat pack.Dockerfile
-    - docker build -t ${IMAGE_FULL}-arm7 -f pack.Dockerfile .
-    - docker push ${IMAGE_FULL}-arm7
+    - docker build -t ${IMAGE_FULL}-arm32v7 -f pack.Dockerfile .
+    - docker push ${IMAGE_FULL}-arm32v7
     - echo "========="
     - GOOS=linux GOARCH=amd GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
     - |
@@ -68,6 +68,10 @@ go_build:
     - docker build -t ${IMAGE_FULL}-arm64v8 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-arm64v8
     - echo "manifest magic"
+    - docker manifest create ${IMAGE_FULL} ${IMAGE_FULL}-amd64 ${IMAGE_FULL}-arm32v7 ${IMAGE_FULL}-arm64v8
+    - docker manifest push ${IMAGE_FULL}
+    - docker manifest create ${IMAGE_BRANCH} ${IMAGE_FULL}-amd64 ${IMAGE_FULL}-arm32v7 ${IMAGE_FULL}-arm64v8
+    - docker manifest push ${IMAGE_BRANCH}
   artifacts:
     paths:
       - build/
