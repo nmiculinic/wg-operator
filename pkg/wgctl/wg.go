@@ -41,9 +41,17 @@ func (n *WireguardSetup) SyncConfigToMachine(cfg *Config) (retErr error) {
 			return err
 		}
 		log.Info("link not found, creating")
-		if err := exec.Command("ip", "link", "add", "dev", n.InterfaceName, "type", "wireguard").Run(); err != nil {
+		wgLink := &netlink.GenericLink{
+			LinkAttrs: netlink.LinkAttrs{
+				Name: n.InterfaceName,
+			},
+			LinkType: "wireguard",
+		}
+		if err := netlink.LinkAdd(wgLink); err != nil {
 			log.Error(err, "cannot create link", "iface", n.InterfaceName)
 			return err
+		}
+		if err := exec.Command("ip", "link", "add", "dev", n.InterfaceName, "type", "wireguard").Run(); err != nil {
 		}
 
 		link, err = netlink.LinkByName(n.InterfaceName)
@@ -152,7 +160,7 @@ func (n *WireguardSetup) syncRoutes(link netlink.Link, cfg *Config) error {
 			}
 			if err := netlink.RouteAdd(&netlink.Route{
 				LinkIndex: link.Attrs().Index,
-				Dst: &rt,
+				Dst:       &rt,
 			}); err != nil {
 				log.Error(err, "cannot setup route", "iface", n.InterfaceName, "route", rt.String())
 				return err
@@ -172,7 +180,7 @@ func (n *WireguardSetup) syncRoutes(link netlink.Link, cfg *Config) error {
 			log.Info("extra manual route found", "iface", n.InterfaceName, "route", rt.String())
 			if err := netlink.RouteDel(&netlink.Route{
 				LinkIndex: link.Attrs().Index,
-				Dst: rt,
+				Dst:       rt,
 			}); err != nil {
 				log.Error(err, "cannot setup route", "iface", n.InterfaceName, "route", rt.String())
 				return err
