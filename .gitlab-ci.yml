@@ -12,7 +12,7 @@ go_build:
   before_script:
     - mkdir -p $GOPATH/src/github.com/KrakenSystems/
     - cd $GOPATH/src/github.com/KrakenSystems/
-    - ln -s $(pwd)
+    - ln -s $CI_PROJECT_DIR
     - export GO_PROJECT_PATH="$GOPATH/src/github.com/KrakenSystems/${CI_PROJECT_NAME}"
     - echo $GO_PROJECT_PATH
     - cd $GO_PROJECT_PATH
