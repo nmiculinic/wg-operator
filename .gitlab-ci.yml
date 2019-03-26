@@ -9,7 +9,26 @@ variables:
 go_build:
   variables:
     DOCKERVERSION: 18.09.3
+    # When using dind service we need to instruct docker, to talk with the
+    # daemon started inside of the service. The daemon is available with
+    # a network connection instead of the default /var/run/docker.sock socket.
+    #
+    # The 'docker' hostname is the alias of the service container as described at
+    # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services
+    #
+    # Note that if you're using Kubernetes executor, the variable should be set to
+    # tcp://localhost:2375 because of how Kubernetes executor connects services
+    # to the job container
+    DOCKER_HOST: tcp://docker:2375/
+    # When using dind, it's wise to use the overlayfs driver for
+    # improved performance.
+    # DOCKER_DRIVER: overlay2
   before_script:
+    - go env
+    - docker info
+    - mkdir ~/.docker || true
+    - echo $DOCKER_CONFIG | base64 -d > ~/.docker/config.json
+    - cat ~/.docker/config.json | wc
     - mkdir -p $GOPATH/src/github.com/KrakenSystems/
     - cd $GOPATH/src/github.com/KrakenSystems/
     - ln -s $CI_PROJECT_DIR
