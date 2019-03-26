@@ -8,12 +8,13 @@ import (
 	"github.com/Masterminds/sprig"
 	"github.com/mdlayher/wireguardctrl/wgtypes"
 	"net"
+	"strings"
 	"text/template"
 )
 
 type Config struct {
 	wgtypes.Config
-	Address net.IP
+	Address *net.IPNet
 }
 
 func (cfg *Config) String() string {
@@ -143,16 +144,26 @@ func CreateClientConfig(req ClientRequest) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	var ip *net.IPNet
+	if strings.Contains(req.Client.Spec.Address, "/") {
+		_, ip, err = net.ParseCIDR(req.Client.Spec.Address)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, ip, err = net.ParseCIDR(req.Client.Spec.Address + "/32")
+		if err != nil {
+			return nil, err
+		}
+	}
 	cfg := Config{
-		Address: net.ParseIP(req.Client.Spec.Address),
+		Address: ip,
 		Config: wgtypes.Config{
 			PrivateKey:   &key,
 			ReplacePeers: true,
 			Peers:        peers,
 		},
-	}
-	if cfg.Address == nil {
-		return nil, fmt.Errorf("cannot parse IP %v", req.Client.Spec.Address)
 	}
 
 	return &cfg, nil
@@ -186,8 +197,21 @@ func CreateServerConfig(req ServerRequest) (*Config, error) {
 		return nil, err
 	}
 
+	var ip *net.IPNet
+	if strings.Contains(req.Me.Spec.Address, "/") {
+		_, ip, err = net.ParseCIDR(req.Me.Spec.Address)
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		_, ip, err = net.ParseCIDR(req.Me.Spec.Address + "/32")
+		if err != nil {
+			return nil, err
+		}
+	}
+
 	cfg := Config{
-		Address: net.ParseIP(req.Me.Spec.Address),
+		Address: ip,
 		Config: wgtypes.Config{
 			PrivateKey:   &key,
 			ReplacePeers: true,
