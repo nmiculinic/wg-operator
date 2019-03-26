@@ -30,9 +30,41 @@ go_build:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
     - go test ./...
-    - GOOS=linux GOARCH=amd64 go build -o build/${CI_PROJECT_PATH}-amd64 ./cmd/manager
-    - GOOS=linux GOARCH=arm GOARM=7 go build -o build/${CI_PROJECT_PATH}-arm7 ./cmd/manager
-    - GOOS=linux GOARCH=arm64 go build -o build/${CI_PROJECT_PATH}-arm64 ./cmd/manager
+    - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-amd64 ./cmd/manager
+    - |
+      cat << EOF > pack.Dockerfile
+      FROM alpine
+      WORKDIR /bin
+      COPY build/${CI_PROJECT_PATH}-amd64 /bin/${CI_PROJECT_PATH}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      EOF
+    - cat pack.Dockerfile
+    - docker build -t ${IMAGE_FULL}-amd64 -f pack.Dockerfile .
+    - docker push ${IMAGE_FULL}-amd64
+    - echo "========="
+    - GOOS=linux GOARCH=amd GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-amd7 ./cmd/manager
+    - |
+      cat << EOF > pack.Dockerfile
+      FROM arm32v7/alpine
+      WORKDIR /bin
+      COPY build/${CI_PROJECT_PATH}-arm7 /bin/${CI_PROJECT_PATH}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      EOF
+    - cat pack.Dockerfile
+    - docker build -t ${IMAGE_FULL}-arm7 -f pack.Dockerfile .
+    - docker push ${IMAGE_FULL}-arm7
+    - echo "========="
+    - GOOS=linux GOARCH=amd GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
+    - |
+      cat << EOF > pack.Dockerfile
+      FROM arm64v8/alpine
+      WORKDIR /bin
+      COPY build/${CI_PROJECT_PATH}-arm64v8 /bin/${CI_PROJECT_PATH}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      EOF
+    - cat pack.Dockerfile
+    - docker build -t ${IMAGE_FULL}-arm64v8 -f pack.Dockerfile .
+    - docker push ${IMAGE_FULL}-arm64v8
     - docker push ${IMAGE_FULL}
     - docker push ${IMAGE_BRANCH}
   artifacts:
