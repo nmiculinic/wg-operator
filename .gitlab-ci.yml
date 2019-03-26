@@ -25,7 +25,6 @@ go_build:
     # DOCKER_DRIVER: overlay2
   before_script:
     - go env
-    - docker info
     - mkdir ~/.docker || true
     - echo $DOCKER_CONFIG | base64 -d > ~/.docker/config.json
     - cat ~/.docker/config.json | wc
@@ -41,6 +40,7 @@ go_build:
     - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
+    - docker info
     - cd $GO_PROJECT_PATH
     - pwd
     - ls
