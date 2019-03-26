@@ -64,7 +64,7 @@ go_build:
     - docker build -t ${IMAGE_FULL}-amd64 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-amd64
     - echo "========="
-    - GOOS=linux GOARCH=amd GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm32v7 ./cmd/manager
+    - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm32v7 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm32v7/alpine
@@ -76,7 +76,7 @@ go_build:
     - docker build -t ${IMAGE_FULL}-arm32v7 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-arm32v7
     - echo "========="
-    - GOOS=linux GOARCH=amd GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
+    - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm64v8/alpine
