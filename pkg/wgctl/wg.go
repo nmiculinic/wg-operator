@@ -1,7 +1,6 @@
 package wgctl
 
 import (
-	"fmt"
 	"github.com/mdlayher/wireguardctrl"
 	"github.com/vishvananda/netlink"
 	"io/ioutil"
@@ -54,6 +53,11 @@ func (n *WireguardSetup) SyncConfigToMachine(cfg *Config) (retErr error) {
 		}
 	}
 	log.Info("link", "type", link.Type(), "attrs", link.Attrs())
+	if err := netlink.LinkSetUp(link); err != nil {
+		log.Error(err, "cannot set link up", "type", link.Type(), "attrs", link.Attrs())
+		return err
+	}
+	log.Info("set device up", "iface", n.InterfaceName)
 
 	if err := n.Client.ConfigureDevice(n.InterfaceName, cfg.Config); err != nil {
 		log.Error(err, "cannot configure device", "iface", n.InterfaceName)
@@ -81,12 +85,6 @@ func (n *WireguardSetup) SyncConfigToMachine(cfg *Config) (retErr error) {
 }
 
 func (n *WireguardSetup) syncAddress(link netlink.Link, cfg *Config) error {
-	if err := exec.Command("ip", "link", "set", n.InterfaceName, "up").Run(); err != nil {
-		log.Error(err, "cannot up link", "iface", n.InterfaceName)
-		return err
-	}
-	log.Info("set device up", "iface", n.InterfaceName)
-
 	addrs, err := netlink.AddrList(link, syscall.AF_INET)
 	if err != nil {
 		log.Error(err, "cannot read link address")
@@ -152,9 +150,11 @@ func (n *WireguardSetup) syncRoutes(link netlink.Link, cfg *Config) error {
 				log.Info("route present", "iface", n.InterfaceName, "route", rt.String())
 				continue
 			}
-			cmd := exec.Command("ip", "route", "add", rt.String(), "dev", n.InterfaceName)
-			if stdoutStderr, err := cmd.CombinedOutput(); err != nil {
-				log.Error(err, "cannot setup route", "iface", n.InterfaceName, "args", fmt.Sprint(cmd.Args), "output", string(stdoutStderr))
+			if err := netlink.RouteAdd(&netlink.Route{
+				LinkIndex: link.Attrs().Index,
+				Dst: &rt,
+			}); err != nil {
+				log.Error(err, "cannot setup route", "iface", n.InterfaceName, "route", rt.String())
 				return err
 			}
 			log.Info("route added", "iface", n.InterfaceName, "route", rt.String())
@@ -162,12 +162,19 @@ func (n *WireguardSetup) syncRoutes(link netlink.Link, cfg *Config) error {
 	}
 
 	// Clean extra routes
-	for rt, p := range presentRoutes {
+	for rtStr, p := range presentRoutes {
+		_, rt, err := net.ParseCIDR(rtStr)
+		if err != nil {
+			log.Info("cannot parse route", "iface", n.InterfaceName, "route", rtStr)
+			return err
+		}
 		if p < 2 {
-			log.Info("extra manual route found", "iface", n.InterfaceName, "route", rt)
-			cmd := exec.Command("ip", "route", "del", rt, "dev", n.InterfaceName)
-			if stdoutStderr, err := cmd.CombinedOutput(); err != nil {
-				log.Error(err, "cannot delete route", "iface", n.InterfaceName, "args", fmt.Sprint(cmd.Args), "output", string(stdoutStderr))
+			log.Info("extra manual route found", "iface", n.InterfaceName, "route", rt.String())
+			if err := netlink.RouteDel(&netlink.Route{
+				LinkIndex: link.Attrs().Index,
+				Dst: rt,
+			}); err != nil {
+				log.Error(err, "cannot setup route", "iface", n.InterfaceName, "route", rt.String())
 				return err
 			}
 			log.Info("route deleted", "iface", n.InterfaceName, "route", rt)
