@@ -16,18 +16,12 @@ go_build:
     - cd $GO_PROJECT_PATH
     - pwd
     - go get github.com/golang/dep/cmd/dep  # Install dep
-    - mkdir -p $GOPATH/src/github.com/operator-framework
-    - cd $GOPATH/src/github.com/operator-framework
-    - git clone https://github.com/operator-framework/operator-sdk
-    - cd operator-sdk
-    - git checkout master
-    - make dep
-    - make install
     - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
     - cd $GO_PROJECT_PATH
     - pwd
+    - ls
   services:
     - docker:dind
   stage: build
@@ -35,8 +29,10 @@ go_build:
   script:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
-    - operator-sdk build ${IMAGE_FULL}
-    - operator-sdk build ${IMAGE_BRANCH}
+    - go test ./...
+    - GOOS=linux GOARCH=amd64 go build -o build/${CI_PROJECT_PATH}-amd64 ./cmd/manager
+    - GOOS=linux GOARCH=arm GOARM=7 go build -o build/${CI_PROJECT_PATH}-arm7 ./cmd/manager
+    - GOOS=linux GOARCH=arm64 go build -o build/${CI_PROJECT_PATH}-arm64 ./cmd/manager
     - docker push ${IMAGE_FULL}
     - docker push ${IMAGE_BRANCH}
   artifacts:
