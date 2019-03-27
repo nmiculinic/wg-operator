@@ -1,10 +1,11 @@
 package v1alpha1
 
 import (
+	"net"
+
 	"github.com/mdlayher/wireguardctrl/wgtypes"
 	"github.com/nmiculinic/wg-quick-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"net"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -22,6 +23,7 @@ type ServerSpec struct {
 }
 
 var _ VPNNode = (*ServerSpec)(nil)
+
 func (*ServerSpec) isNode() {}
 
 func (server *ServerSpec) ToPeerConfig() (wgtypes.PeerConfig, error) {
@@ -36,10 +38,10 @@ func (server *ServerSpec) ToPeerConfig() (wgtypes.PeerConfig, error) {
 	return peer, nil
 }
 
-func (server *ServerSpec) ToInterfaceConfig(privateKeyFile string) (*wgctl.Config, error) {
+func (server *ServerSpec) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
 	cfg, err := server.CommonSpec.toInterfaceConfig(privateKeyFile)
 	if err != nil {
-		return nil,err
+		return nil, err
 	}
 	ep, err := net.ResolveUDPAddr("", server.Endpoint)
 	if err != nil {

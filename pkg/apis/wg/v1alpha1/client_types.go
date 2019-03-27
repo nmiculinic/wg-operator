@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"github.com/mdlayher/wireguardctrl/wgtypes"
+	"github.com/nmiculinic/wg-quick-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -17,6 +18,7 @@ type ClientSpec struct {
 
 	CommonSpec `json:",inline"`
 }
+
 var _ VPNNode = (*ClientSpec)(nil)
 
 func (*ClientSpec) isNode() {}
@@ -25,7 +27,7 @@ func (client *ClientSpec) ToPeerConfig() (wgtypes.PeerConfig, error) {
 	return client.CommonSpec.toPeerConfig()
 }
 
-func (client *ClientSpec) ToInterfaceConfig(privateKeyFile string) (*wgctl.Config, error) {
+func (client *ClientSpec) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
 	return client.CommonSpec.toInterfaceConfig(privateKeyFile)
 }
 

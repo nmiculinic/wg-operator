@@ -1,15 +1,17 @@
 package v1alpha1
 
 import (
-	"github.com/mdlayher/wireguardctrl/wgtypes"
-	"github.com/nmiculinic/wg-quick-go"
 	"io/ioutil"
 	"net"
 	"strings"
+
+	"github.com/mdlayher/wireguardctrl/wgtypes"
+	"github.com/nmiculinic/wg-quick-go"
 )
+
 type VPNNode interface {
 	ToPeerConfig() (wgtypes.PeerConfig, error)
-	ToInterfaceConfig(privateKeyFile string) (*wgctl.Config, error)
+	ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error)
 	isNode()
 }
 
@@ -20,7 +22,7 @@ type CommonSpec struct {
 }
 
 func (common *CommonSpec) toPeerConfig() (wgtypes.PeerConfig, error) {
-	srvKey, err := wgctl.ParseKey(common.PublicKey)
+	srvKey, err := wgquick.ParseKey(common.PublicKey)
 	peer := wgtypes.PeerConfig{
 		ReplaceAllowedIPs: true,
 		PublicKey:         srvKey,
@@ -45,12 +47,12 @@ func (common *CommonSpec) toPeerConfig() (wgtypes.PeerConfig, error) {
 	return peer, nil
 }
 
-func (common *CommonSpec) toInterfaceConfig(privateKeyFile string) (*wgctl.Config, error){
+func (common *CommonSpec) toInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
 	pkey, err := ioutil.ReadFile(privateKeyFile)
 	if err != nil {
 		return nil, err
 	}
-	key, err := wgctl.ParseKey(string(pkey))
+	key, err := wgquick.ParseKey(string(pkey))
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +69,7 @@ func (common *CommonSpec) toInterfaceConfig(privateKeyFile string) (*wgctl.Confi
 			return nil, err
 		}
 	}
-	cfg := wgctl.Config{
+	cfg := wgquick.Config{
 		Address: []*net.IPNet{ip},
 		Config: wgtypes.Config{
 			PrivateKey:   &key,
