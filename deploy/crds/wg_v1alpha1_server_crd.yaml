@@ -13,6 +13,14 @@ spec:
   scope: Namespaced
   subresources:
     status: {}
+  additionalPrinterColumns:
+    - name: PublicKey
+      type: string
+      description: Public key for this node
+      JSONPath: .spec.publicKey
+    - name: Age
+      type: date
+      JSONPath: .metadata.creationTimestamp
   validation:
     openAPIV3Schema:
       properties:
