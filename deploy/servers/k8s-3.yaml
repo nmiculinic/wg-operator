@@ -7,4 +7,4 @@ spec:
   address: "10.102.0.3"
   extraAllowedIPs:
   - "10.100.0.0/14"
-  endpoint: 136.243.89.93:5555
+  endpoint: 11.12.13.14:5555
