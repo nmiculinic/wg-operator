@@ -4,10 +4,7 @@ import (
 	"github.com/nmiculinic/wg-quick-go"
 	"io/ioutil"
 	"sigs.k8s.io/controller-runtime/pkg/event"
-	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
 )
-
-var log = logf.Log.WithName("wgctl")
 
 type WireguardSetup struct {
 	NodeName       string

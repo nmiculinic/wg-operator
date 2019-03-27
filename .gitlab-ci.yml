@@ -9,36 +9,92 @@ variables:
 go_build:
   variables:
     DOCKERVERSION: 18.09.3
+    # When using dind service we need to instruct docker, to talk with the
+    # daemon started inside of the service. The daemon is available with
+    # a network connection instead of the default /var/run/docker.sock socket.
+    #
+    # The 'docker' hostname is the alias of the service container as described at
+    # https://docs.gitlab.com/ee/ci/docker/using_docker_images.html#accessing-the-services
+    #
+    # Note that if you're using Kubernetes executor, the variable should be set to
+    # tcp://localhost:2375 because of how Kubernetes executor connects services
+    # to the job container
+    DOCKER_HOST: tcp://docker:2375/
+    # When using dind, it's wise to use the overlayfs driver for
+    # improved performance.
+    # DOCKER_DRIVER: overlay2
   before_script:
+    - go env
+    - mkdir ~/.docker || true
+    - echo $DOCKER_CONFIG | base64 -d > ~/.docker/config.json
+    - cat ~/.docker/config.json | wc
+    - mkdir -p $GOPATH/src/github.com/KrakenSystems/
+    - cd $GOPATH/src/github.com/KrakenSystems/
+    - ln -s $CI_PROJECT_DIR
     - export GO_PROJECT_PATH="$GOPATH/src/github.com/KrakenSystems/${CI_PROJECT_NAME}"
-    - mkdir -p $GO_PROJECT_PATH
-    - ln -s $(pwd) $GO_PROJECT_PATH
+    - echo $GO_PROJECT_PATH
     - cd $GO_PROJECT_PATH
     - pwd
+    - ls
     - go get github.com/golang/dep/cmd/dep  # Install dep
-    - mkdir -p $GOPATH/src/github.com/operator-framework
-    - cd $GOPATH/src/github.com/operator-framework
-    - git clone https://github.com/operator-framework/operator-sdk
-    - cd operator-sdk
-    - git checkout master
-    - make dep
-    - make install
     - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
+    - docker info
     - cd $GO_PROJECT_PATH
     - pwd
+    - ls
   services:
     - docker:dind
   stage: build
   image: golang:1.12
   script:
+    - mkdir -p .cache
+    - export GOCACHE=${CI_PROJECT_DIR}/.cache
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
-    - operator-sdk build ${IMAGE_FULL}
-    - operator-sdk build ${IMAGE_BRANCH}
-    - docker push ${IMAGE_FULL}
-    - docker push ${IMAGE_BRANCH}
+    - go test ./...
+    - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-amd64 ./cmd/manager
+    - |
+      cat << EOF > pack.Dockerfile
+      FROM alpine
+      WORKDIR /bin
+      COPY build/${CI_PROJECT_PATH}-amd64 /bin/${CI_PROJECT_PATH}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      EOF
+    - cat pack.Dockerfile
+    - docker build -t ${IMAGE_FULL}-amd64 -f pack.Dockerfile .
+    - docker push ${IMAGE_FULL}-amd64
+    - docker build -t ${IMAGE_BRANCH}-amd64 -f pack.Dockerfile .
+    - docker push ${IMAGE_BRANCH}-amd64
+    - echo "========="
+    - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm32v7 ./cmd/manager
+    - |
+      cat << EOF > pack.Dockerfile
+      FROM arm32v7/alpine
+      WORKDIR /bin
+      COPY build/${CI_PROJECT_PATH}-arm32v7 /bin/${CI_PROJECT_PATH}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      EOF
+    - cat pack.Dockerfile
+    - docker build -t ${IMAGE_FULL}-arm32v7 -f pack.Dockerfile .
+    - docker push ${IMAGE_FULL}-arm32v7
+    - docker build -t ${IMAGE_BRANCH}-arm32v7 -f pack.Dockerfile .
+    - docker push ${IMAGE_BRANCH}-arm32v7
+    - echo "========="
+    - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
+    - |
+      cat << EOF > pack.Dockerfile
+      FROM arm64v8/alpine
+      WORKDIR /bin
+      COPY build/${CI_PROJECT_PATH}-arm64v8 /bin/${CI_PROJECT_PATH}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      EOF
+    - cat pack.Dockerfile
+    - docker build -t ${IMAGE_FULL}-arm64v8 -f pack.Dockerfile .
+    - docker push ${IMAGE_FULL}-arm64v8
+    - docker build -t ${IMAGE_BRANCH}-arm64v8 -f pack.Dockerfile .
+    - docker push ${IMAGE_BRANCH}-arm64v8
   artifacts:
     paths:
       - build/
@@ -46,5 +102,5 @@ go_build:
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - vendor/
+      - .cache/
 

@@ -18,7 +18,10 @@ func commonPeerConfig(common v1alpha1.CommonSpec) (wgtypes.PeerConfig, error) {
 
 	_, c, err := net.ParseCIDR(common.Address + "/32")
 	if err != nil {
-		return wgtypes.PeerConfig{}, err
+		_, c, err = net.ParseCIDR(common.Address)
+		if err != nil {
+			return wgtypes.PeerConfig{}, err
+		}
 	}
 	peer.AllowedIPs = append(peer.AllowedIPs, *c)
 	for _, cidr := range common.ExtraAllowedIPs {
