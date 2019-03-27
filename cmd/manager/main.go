@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"github.com/KrakenSystems/wg-operator/pkg/controller/client"
 	"github.com/KrakenSystems/wg-operator/pkg/controller/server"
+	"github.com/KrakenSystems/wg-operator/pkg/logrAdapter"
 	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
-	"github.com/go-logr/logr"
 	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
@@ -25,7 +25,6 @@ import (
 // Change below variables to serve metrics on different host or port.
 var (
 	metricsHost       = "0.0.0.0"
-	metricsPort int32 = 6060
 )
 var log = logf.Log.WithName("cmd")
 
@@ -35,38 +34,6 @@ func printVersion() {
 	log.Info(fmt.Sprintf("Version of operator-sdk: %v", sdkVersion.Version))
 }
 
-type logrusLogf struct {
-	logger logrus.FieldLogger
-}
-
-func (l logrusLogf) Info(msg string, keysAndValues ...interface{}) {
-	l.WithValues(keysAndValues...).(logrusLogf).logger.Info(msg)
-}
-
-func (l logrusLogf) Enabled() bool {
-	return true
-}
-
-func (l logrusLogf) Error(err error, msg string, keysAndValues ...interface{}) {
-	o := l.WithValues(keysAndValues...).(logrusLogf)
-	o.logger.WithError(err).Error(msg)
-}
-
-func (l logrusLogf) V(level int) logr.InfoLogger {
-	return l
-}
-
-func (l logrusLogf) WithValues(keysAndValues ...interface{}) logr.Logger {
-	olog := l.logger
-	for i := 0; i < len(keysAndValues); i+=2 {
-		olog = olog.WithField(fmt.Sprint(keysAndValues[i]), keysAndValues[i + 1])
-	}
-	return logrusLogf{olog}
-}
-
-func (l logrusLogf) WithName(name string) logr.Logger {
-	return logrusLogf{l.logger.WithField("name", name)}
-}
 
 func main() {
 	hostname, err := os.Hostname()
@@ -82,10 +49,11 @@ func main() {
 	nodeName := pflag.String("node-name", hostname, "hostname")
 	interfaceName := pflag.String("wg-interface", "wg0", "interface to configure")
 	privateKeyFile := pflag.String("wg-private-key-file", "/etc/wireguard/wg0.key", "wireguard private key file")
+	metricsPort := pflag.Int("metrics-port", 6060, "metrics port")
 
 	pflag.Parse()
 
-	logf.SetLogger(logrusLogf{logrus.WithField("name", "wg-operator")})
+	logf.SetLogger(logrAdapter.NewLogrusAdapter(logrus.WithField("name", "wg-operator")))
 	logrus.SetLevel(logrus.TraceLevel)
 
 	printVersion()
@@ -106,7 +74,7 @@ func main() {
 	// Create a new Cmd to provide shared dependencies and start components
 	mgr, err := manager.New(cfg, manager.Options{
 		Namespace:          namespace,
-		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
+		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, *metricsPort),
 	})
 	if err != nil {
 		log.Error(err, "")
