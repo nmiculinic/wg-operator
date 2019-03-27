@@ -50,7 +50,7 @@ go_build:
   image: golang:1.12
   script:
     - mkdir -p .cache
-    - export GOCACHE=${$CI_PROJECT_DIR}/.cache
+    - export GOCACHE=${CI_PROJECT_DIR}/.cache
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
     - go test ./...
