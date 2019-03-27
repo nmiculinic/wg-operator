@@ -1,7 +1,10 @@
 package v1alpha1
 
 import (
+	"github.com/mdlayher/wireguardctrl/wgtypes"
+	"github.com/nmiculinic/wg-quick-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"net"
 )
 
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
@@ -16,6 +19,34 @@ type ServerSpec struct {
 
 	CommonSpec `json:",inline"`
 	Endpoint   string `json:"endpoint"`
+}
+
+var _ VPNNode = (*ServerSpec)(nil)
+func (*ServerSpec) isNode() {}
+
+func (server *ServerSpec) ToPeerConfig() (wgtypes.PeerConfig, error) {
+	peer, err := server.CommonSpec.toPeerConfig()
+	if err != nil {
+		return wgtypes.PeerConfig{}, err
+	}
+	peer.Endpoint, err = net.ResolveUDPAddr("", server.Endpoint)
+	if err != nil {
+		return wgtypes.PeerConfig{}, err
+	}
+	return peer, nil
+}
+
+func (server *ServerSpec) ToInterfaceConfig(privateKeyFile string) (*wgctl.Config, error) {
+	cfg, err := server.CommonSpec.toInterfaceConfig(privateKeyFile)
+	if err != nil {
+		return nil,err
+	}
+	ep, err := net.ResolveUDPAddr("", server.Endpoint)
+	if err != nil {
+		return nil, err
+	}
+	cfg.ListenPort = &ep.Port
+	return cfg, nil
 }
 
 // ServerStatus defines the observed state of Server
