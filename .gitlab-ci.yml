@@ -49,6 +49,8 @@ go_build:
   stage: build
   image: golang:1.12
   script:
+    - mkdir -p .cache
+    - export GOCACHE=${CI_PROJECT_PATH}/.cache
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
     - go test ./...
@@ -63,6 +65,8 @@ go_build:
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-amd64 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-amd64
+    - docker build -t ${IMAGE_BRANCH}-amd64 -f pack.Dockerfile .
+    - docker push ${IMAGE_BRANCH}-amd64
     - echo "========="
     - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm32v7 ./cmd/manager
     - |
@@ -75,6 +79,8 @@ go_build:
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-arm32v7 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-arm32v7
+    - docker build -t ${IMAGE_BRANCH}-arm32v7 -f pack.Dockerfile .
+    - docker push ${IMAGE_BRANCH}-arm32v7
     - echo "========="
     - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
     - |
@@ -87,11 +93,8 @@ go_build:
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-arm64v8 -f pack.Dockerfile .
     - docker push ${IMAGE_FULL}-arm64v8
-    - echo "manifest magic"
-    - docker manifest create ${IMAGE_FULL} ${IMAGE_FULL}-amd64 ${IMAGE_FULL}-arm32v7 ${IMAGE_FULL}-arm64v8
-    - docker manifest push ${IMAGE_FULL}
-    - docker manifest create ${IMAGE_BRANCH} ${IMAGE_FULL}-amd64 ${IMAGE_FULL}-arm32v7 ${IMAGE_FULL}-arm64v8
-    - docker manifest push ${IMAGE_BRANCH}
+    - docker build -t ${IMAGE_BRANCH}-arm64v8 -f pack.Dockerfile .
+    - docker push ${IMAGE_BRANCH}-arm64v8
   artifacts:
     paths:
       - build/
@@ -99,5 +102,5 @@ go_build:
   cache:
     key: ${CI_COMMIT_REF_SLUG}
     paths:
-      - vendor/
+      - .cache/
 
