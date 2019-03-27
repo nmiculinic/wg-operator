@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/base64"
 	"fmt"
+	"io/ioutil"
 	"time"
 
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
@@ -35,6 +36,7 @@ type NodeControllerConfig struct {
 	Namespace      string
 	Mode           Mode
 	DryRun         bool
+	SyncConfigPath string
 }
 
 func (n *NodeControllerConfig) Create(ev event.CreateEvent) bool {
@@ -71,20 +73,28 @@ func (r *nodeController) Reconcile(request reconcile.Request) (reconcile.Result,
 }
 
 func (ctl *nodeController) Start(done <-chan struct{}) error {
+	log := logrus.WithField("iface", ctl.InterfaceName)
 	// retry on error
 	// TODO: Added exponential backoff
 	// TODO: extract these times to constants
+	sync := func() {
+		err := ctl.refresh()
+		switch err {
+		case nil:
+			ctl.dirty = false
+			log.Infoln("successfully synced config")
+		default:
+			ctl.dirty = true
+			log.WithError(err).Errorln("error during syncing")
+		}
+	}
+
 	t := time.NewTicker(5 * time.Second)
 	for {
 		select {
 		case <-t.C:
 			if ctl.dirty {
-				switch ctl.refresh() {
-				case nil:
-					ctl.dirty = false
-				default:
-					ctl.dirty = true
-				}
+				sync()
 			}
 		case <-done:
 			return nil
@@ -99,34 +109,29 @@ func (ctl *nodeController) Start(done <-chan struct{}) error {
 					break outer
 				}
 			}
-			switch ctl.refresh() {
-			case nil:
-				ctl.dirty = false
-			default:
-				ctl.dirty = true
-			}
+			sync()
 		}
 	}
 }
 
 func (r *nodeController) refresh() error {
 	ctx := context.Background()
-	log := logrus.WithContext(ctx)
+	log := logrus.WithField("iface", r.InterfaceName)
 
 	var me wgv1alpha1.VPNNode
 	switch r.Mode {
 	case Server:
 		srvme := &wgv1alpha1.Server{}
 		if err := r.client.Get(ctx, client.ObjectKey{Name: r.NodeName, Namespace: r.Namespace}, srvme); err != nil {
-			return errors.New("cannot find myself")
+			return errors.New("cannot find myself -- server")
 		}
-		me = &srvme.Spec
+		me = srvme
 	case Client:
 		clientMe := &wgv1alpha1.Client{}
 		if err := r.client.Get(ctx, client.ObjectKey{Name: r.NodeName, Namespace: r.Namespace}, clientMe); err != nil {
-			return errors.New("cannot find myself")
+			return errors.New("cannot find myself -- client")
 		}
-		me = &clientMe.Spec
+		me = clientMe
 	default:
 		return errors.New("invalid mode type!")
 	}
@@ -146,7 +151,7 @@ func (r *nodeController) refresh() error {
 			if srv.Name == r.NodeName {
 				continue
 			}
-			peer, err := srv.Spec.ToPeerConfig()
+			peer, err := srv.ToPeerConfig()
 			if err != nil {
 				return fmt.Errorf("cannot generate peer config for server %s: %v", srv.Name, err)
 			}
@@ -160,7 +165,10 @@ func (r *nodeController) refresh() error {
 			log.Error(err, "cannot list all client")
 		}
 		for _, cl := range clients.Items {
-			peer, err := cl.Spec.ToPeerConfig()
+			if cl.Name == (me).(*wgv1alpha1.Server).Name {
+				continue
+			}
+			peer, err := cl.ToPeerConfig()
 			if err != nil {
 				return fmt.Errorf("cannot generate peer config for client %s: %v", cl.Name, err)
 			}
@@ -182,7 +190,20 @@ func (r *nodeController) refresh() error {
 		log.Info("Dry run, not applying config!")
 		return nil
 	}
-	return cfg.Sync(r.InterfaceName, log)
+	if err := cfg.Sync(r.InterfaceName, log); err != nil {
+		return err
+	}
+	if r.SyncConfigPath != "" {
+		m, err := cfg.MarshalText()
+		if err != nil {
+			return fmt.Errorf("cannot marshal config: %v", err)
+		}
+		if err := ioutil.WriteFile(r.SyncConfigPath, m, 0600); err != nil {
+			return fmt.Errorf("cannot write config to %s: %v", r.SyncConfigPath, err)
+		}
+		log.Infoln("Synced config to disk")
+	}
+	return nil
 }
 
 // Add creates a new Client Controller and adds it to the Manager. The Manager will set fields on the Controller

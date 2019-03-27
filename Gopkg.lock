@@ -593,7 +593,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:da808822c1a67574bf38959d8e8f26ddae2632a300a74930c1ae0fc4ea946168"
+  digest = "1:728cd187189ebcc7626ec729c0d98a3cef5ba0ed85d5670a326fb2867ed39bd1"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -609,7 +609,7 @@
     "internal/semver",
   ]
   pruneopts = "NT"
-  revision = "45dd101d87843da2a383dd0ce49a8c8519ce766b"
+  revision = "dbeab5af4b8d3204d444b78cafaba18a9a062a50"
 
 [[projects]]
   digest = "1:711179d92dbef98932acd7afd0dab80b4cf2d97f099f3285c9ba8fa451809fec"
@@ -958,6 +958,7 @@
     "github.com/nmiculinic/wg-quick-go",
     "github.com/operator-framework/operator-sdk/pkg/k8sutil",
     "github.com/operator-framework/operator-sdk/version",
+    "github.com/pkg/errors",
     "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",
     "k8s.io/apimachinery/pkg/apis/meta/v1",

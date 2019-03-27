@@ -19,16 +19,16 @@ type ClientSpec struct {
 	CommonSpec `json:",inline"`
 }
 
-var _ VPNNode = (*ClientSpec)(nil)
+var _ VPNNode = (*Client)(nil)
 
-func (*ClientSpec) isNode() {}
+func (*Client) isNode() {}
 
-func (client *ClientSpec) ToPeerConfig() (wgtypes.PeerConfig, error) {
-	return client.CommonSpec.toPeerConfig()
+func (client *Client) ToPeerConfig() (wgtypes.PeerConfig, error) {
+	return client.Spec.CommonSpec.toPeerConfig()
 }
 
-func (client *ClientSpec) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
-	return client.CommonSpec.toInterfaceConfig(privateKeyFile)
+func (client *Client) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
+	return client.Spec.CommonSpec.toInterfaceConfig(privateKeyFile)
 }
 
 // ClientStatus defines the observed state of Client

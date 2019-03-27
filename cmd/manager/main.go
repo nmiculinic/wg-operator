@@ -47,6 +47,7 @@ func main() {
 	privateKeyFile := pflag.String("wg-private-key-file", "/etc/wireguard/wg0.key", "wireguard private key file")
 	metricsPort := pflag.Int("metrics-port", 6060, "metrics port")
 	dryRun := pflag.BoolP("dry-run", "n", false, "Dry run")
+	syncConfigPath := pflag.String("sync-config-path", "", "if set syncs most recently applied config to this location")
 
 	pflag.Parse()
 
@@ -92,6 +93,7 @@ func main() {
 		PrivateKeyFile: *privateKeyFile,
 		Namespace:      namespace,
 		DryRun:         *dryRun,
+		SyncConfigPath: *syncConfigPath,
 	}
 
 	switch *mode {

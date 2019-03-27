@@ -22,28 +22,28 @@ type ServerSpec struct {
 	Endpoint   string `json:"endpoint"`
 }
 
-var _ VPNNode = (*ServerSpec)(nil)
+var _ VPNNode = (*Server)(nil)
 
-func (*ServerSpec) isNode() {}
+func (*Server) isNode() {}
 
-func (server *ServerSpec) ToPeerConfig() (wgtypes.PeerConfig, error) {
-	peer, err := server.CommonSpec.toPeerConfig()
+func (server *Server) ToPeerConfig() (wgtypes.PeerConfig, error) {
+	peer, err := server.Spec.CommonSpec.toPeerConfig()
 	if err != nil {
 		return wgtypes.PeerConfig{}, err
 	}
-	peer.Endpoint, err = net.ResolveUDPAddr("", server.Endpoint)
+	peer.Endpoint, err = net.ResolveUDPAddr("", server.Spec.Endpoint)
 	if err != nil {
 		return wgtypes.PeerConfig{}, err
 	}
 	return peer, nil
 }
 
-func (server *ServerSpec) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
-	cfg, err := server.CommonSpec.toInterfaceConfig(privateKeyFile)
+func (server *Server) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
+	cfg, err := server.Spec.CommonSpec.toInterfaceConfig(privateKeyFile)
 	if err != nil {
 		return nil, err
 	}
-	ep, err := net.ResolveUDPAddr("", server.Endpoint)
+	ep, err := net.ResolveUDPAddr("", server.Spec.Endpoint)
 	if err != nil {
 		return nil, err
 	}
