@@ -79,13 +79,5 @@ required = [
   name = "github.com/mdlayher/wireguardctrl"
 
 [[constraint]]
-  name = "github.com/Masterminds/sprig"
-  version = "2.19.0"
-
-[[constraint]]
-  name = "github.com/vishvananda/netlink"
-  version = "1.0.0"
-
-[[constraint]]
   branch = "master"
   name = "github.com/nmiculinic/wg-quick-go"

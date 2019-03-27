@@ -2,7 +2,6 @@ package v1alpha1
 
 import (
 	"github.com/mdlayher/wireguardctrl/wgtypes"
-	"github.com/nmiculinic/wg-quick-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

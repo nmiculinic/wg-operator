@@ -376,14 +376,6 @@
   version = "v0.8.1"
 
 [[projects]]
-  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
-  name = "github.com/pmezard/go-difflib"
-  packages = ["difflib"]
-  pruneopts = "NT"
-  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
-  version = "v1.0.0"
-
-[[projects]]
   digest = "1:ec2a29e3bd141038ae5c3d3a4f57db0c341fcc1d98055a607aedd683aed124ee"
   name = "github.com/prometheus/client_golang"
   packages = [
@@ -467,14 +459,6 @@
   pruneopts = "NT"
   revision = "298182f68c66c05229eb03ac171abe6e309ee79a"
   version = "v1.0.3"
-
-[[projects]]
-  digest = "1:8e8fc2cb42cfa0a18fda0c9c4034092faa7aac773da5efdde8828eb4b96c001d"
-  name = "github.com/stretchr/testify"
-  packages = ["assert"]
-  pruneopts = "NT"
-  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
-  version = "v1.3.0"
 
 [[projects]]
   digest = "1:936ab0fd3f16edc83131e626594a4f4e75426e5adeb7adbe57ed203db4c1b950"
@@ -976,7 +960,6 @@
     "github.com/operator-framework/operator-sdk/version",
     "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",
-    "github.com/stretchr/testify/assert",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/runtime/schema",
