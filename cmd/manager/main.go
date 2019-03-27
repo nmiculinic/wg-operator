@@ -3,19 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/KrakenSystems/wg-operator/pkg/controller/client"
-	"github.com/KrakenSystems/wg-operator/pkg/controller/server"
-	"github.com/KrakenSystems/wg-operator/pkg/logrAdapter"
-	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
-	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
 
 	"github.com/KrakenSystems/wg-operator/pkg/apis"
+	"github.com/KrakenSystems/wg-operator/pkg/controller/node"
+	"github.com/KrakenSystems/wg-operator/pkg/logrAdapter"
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
-	"github.com/spf13/pflag"
-	// _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag" // _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -24,7 +21,7 @@ import (
 
 // Change below variables to serve metrics on different host or port.
 var (
-	metricsHost       = "0.0.0.0"
+	metricsHost = "0.0.0.0"
 )
 var log = logf.Log.WithName("cmd")
 
@@ -33,7 +30,6 @@ func printVersion() {
 	log.Info(fmt.Sprintf("Go OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH))
 	log.Info(fmt.Sprintf("Version of operator-sdk: %v", sdkVersion.Version))
 }
-
 
 func main() {
 	hostname, err := os.Hostname()
@@ -50,6 +46,7 @@ func main() {
 	interfaceName := pflag.String("wg-interface", "wg0", "interface to configure")
 	privateKeyFile := pflag.String("wg-private-key-file", "/etc/wireguard/wg0.key", "wireguard private key file")
 	metricsPort := pflag.Int("metrics-port", 6060, "metrics port")
+	dryRun := pflag.BoolP("dry-run", "n", false, "Dry run")
 
 	pflag.Parse()
 
@@ -89,31 +86,31 @@ func main() {
 		os.Exit(1)
 	}
 
-	wg := &wgctl.WireguardSetup{
+	ctlCfg := node.NodeControllerConfig{
 		NodeName:       *nodeName,
 		InterfaceName:  *interfaceName,
 		PrivateKeyFile: *privateKeyFile,
+		Namespace:      namespace,
+		DryRun:         *dryRun,
 	}
+
 	switch *mode {
 	case "client":
 		log.Info("Running in client mode", "name", *nodeName)
-		if err := client.Add(mgr, wg); err != nil {
-			log.Error(err, "")
-			os.Exit(1)
-		}
+		ctlCfg.Mode = node.Client
 	case "server":
 		log.Info("Running in server mode", "name", *nodeName)
-		if err := server.Add(mgr, wg); err != nil {
-			log.Error(err, "")
-			os.Exit(1)
-		}
+		ctlCfg.Mode = node.Server
 	default:
 		log.Info("unknown mode: " + *mode)
 		os.Exit(5)
 	}
-	log.Info("Starting the Cmd.")
 
-	// Start the Cmd
+	if err := node.Add(mgr, ctlCfg); err != nil {
+		log.Error(err, "Cannot add node controller")
+		os.Exit(6)
+	}
+	log.Info("Starting the Cmd.")
 	if err := mgr.Start(signals.SetupSignalHandler()); err != nil {
 		log.Error(err, "Manager exited non-zero")
 		os.Exit(1)
