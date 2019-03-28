@@ -23,6 +23,7 @@ go_build:
     # When using dind, it's wise to use the overlayfs driver for
     # improved performance.
     # DOCKER_DRIVER: overlay2
+    CGO_ENABLED: 0
   before_script:
     - apk update && apk add git docker gcc make
     # - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
@@ -48,12 +49,13 @@ go_build:
   services:
     - docker:dind
   stage: build
-  image: golang:1.12-alpine
+  image: golang:1.12
   script:
     - mkdir -p .cache
     - export GOCACHE=${CI_PROJECT_DIR}/.cache
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
+    - go env
     - go test ./...
     - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-amd64 ./cmd/manager
     - |
