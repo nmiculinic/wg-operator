@@ -42,15 +42,15 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:5d66e99bd7619956962ef12dd2e04031512dd38cd0b4490c837b5e3028b0482c"
+  digest = "1:72b009535c54eaab2470f404bf0a5daa44eb3573852b3bd984d8c9e02744de04"
   name = "github.com/emicklei/go-restful"
   packages = [
     ".",
     "log",
   ]
   pruneopts = "NT"
-  revision = "e64cccdfee8896c036b8a88d560c5e3ae15d904d"
-  version = "v2.9.1"
+  revision = "9515831d76ca49d15259dccc9765695125d1127e"
+  version = "v2.9.2"
 
 [[projects]]
   digest = "1:81466b4218bf6adddac2572a30ac733a9255919bc2f470b4827a317bd4ee1756"
@@ -326,22 +326,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:370913757e8e9e7b9b17387fe0e55029cc2b2cf26deb934322aa6aaf10210969"
+  digest = "1:d1240dd47156df078a54dbaf1bde03cb706c9548e28a0ac42bcc535ee3583196"
   name = "github.com/nmiculinic/wg-quick-go"
   packages = ["."]
   pruneopts = "NT"
-  revision = "940aafb98dcac630b41e35175d8b03ad67a2f66a"
+  revision = "5f01824316703cfdc9b8d722428aa5d680c70721"
 
 [[projects]]
   branch = "master"
-  digest = "1:5f10ebb985f080702685a1f3e45431d3815c6c7d794f2ad75bcf42faaea3cf75"
+  digest = "1:454bd9a93c12b52b8bfc94f6d61c5026b7e1a366a893bb420dd47a6656a81379"
   name = "github.com/operator-framework/operator-sdk"
   packages = [
     "pkg/k8sutil",
     "version",
   ]
   pruneopts = "NT"
-  revision = "73a4bbdd81e37290e73bfea378259ceafd080127"
+  revision = "147862c0001d2d4c06fe06193f35f3b94ba94761"
 
 [[projects]]
   digest = "1:93b1d84c5fa6d1ea52f4114c37714cddd84d5b78f151b62bb101128dd51399bf"
@@ -523,7 +523,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:f9d2f13baed365df2f09249c839e783cc66ff4f5287d1399a2d558e4ffe7f106"
+  digest = "1:11e93d94b0ff36f8f6165e2543ccab8773e5e55a185085e0f3c9bdd8acffa065"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -535,7 +535,7 @@
     "idna",
   ]
   pruneopts = "NT"
-  revision = "710a502c58a2a4b2d7417a4e24ccb96d8dc13fa3"
+  revision = "63eda1eb0650888965ead1296efd04d0b2b61128"
 
 [[projects]]
   branch = "master"
@@ -593,7 +593,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:728cd187189ebcc7626ec729c0d98a3cef5ba0ed85d5670a326fb2867ed39bd1"
+  digest = "1:6103b53e455a6085a924ec0f64258dc1a061a7ca63df48f23ca3a9ee05115581"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -609,7 +609,7 @@
     "internal/semver",
   ]
   pruneopts = "NT"
-  revision = "dbeab5af4b8d3204d444b78cafaba18a9a062a50"
+  revision = "8f05a32dce9ff80c9bf11baeb89d26b410f39281"
 
 [[projects]]
   digest = "1:711179d92dbef98932acd7afd0dab80b4cf2d97f099f3285c9ba8fa451809fec"
@@ -850,7 +850,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:a6612481318c8360823cb6e157cf103c5eb03a8a9e24f58bfc1021ebd9cde3de"
+  digest = "1:06449c9193d3d1f9375b97d1ce8a3f7a59d531c69ca34a6b0663cf3c144c2178"
   name = "k8s.io/gengo"
   packages = [
     "args",
@@ -863,7 +863,7 @@
     "types",
   ]
   pruneopts = "T"
-  revision = "bc9033e9ec9e0cec1552e9af7c079cb878dfc511"
+  revision = "e17681d19d3ac4837a019ece36c2a0ec31ffe985"
 
 [[projects]]
   digest = "1:29f93bb84d907a2c035e729e19d66fe52165d8c905cb3ef1920140d76ae6afaf"

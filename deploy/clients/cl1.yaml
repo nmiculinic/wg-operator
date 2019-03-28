@@ -11,3 +11,4 @@ spec:
   publicKey: oj/x/PIWqBGgE7NQqtum4ZD+2vruwRmcuTl8/VWwPnc=
   address: "10.102.0.10"
   extraAllowedIPs: []
+  preUp: "echo I'm alive"

@@ -77,10 +77,30 @@ func schema_pkg_apis_wg_v1alpha1_ClientSpec(ref common.ReferenceCallback) common
 							Format: "",
 						},
 					},
-					"address": {
+					"addresses": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"dns": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
 						},
 					},
 					"extraAllowedIPs": {
@@ -96,8 +116,44 @@ func schema_pkg_apis_wg_v1alpha1_ClientSpec(ref common.ReferenceCallback) common
 							},
 						},
 					},
+					"preUp": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"postUp": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"preDown": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"postDown": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"mtu": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"table": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
 				},
-				Required: []string{"publicKey", "address", "extraAllowedIPs"},
+				Required: []string{"publicKey", "addresses", "extraAllowedIPs"},
 			},
 		},
 		Dependencies: []string{},
@@ -171,10 +227,30 @@ func schema_pkg_apis_wg_v1alpha1_ServerSpec(ref common.ReferenceCallback) common
 							Format: "",
 						},
 					},
-					"address": {
+					"addresses": {
 						SchemaProps: spec.SchemaProps{
-							Type:   []string{"string"},
-							Format: "",
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
+						},
+					},
+					"dns": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"array"},
+							Items: &spec.SchemaOrArray{
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"string"},
+										Format: "",
+									},
+								},
+							},
 						},
 					},
 					"extraAllowedIPs": {
@@ -190,6 +266,42 @@ func schema_pkg_apis_wg_v1alpha1_ServerSpec(ref common.ReferenceCallback) common
 							},
 						},
 					},
+					"preUp": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"postUp": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"preDown": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"postDown": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"mtu": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
+					"table": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int32",
+						},
+					},
 					"endpoint": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
@@ -197,7 +309,7 @@ func schema_pkg_apis_wg_v1alpha1_ServerSpec(ref common.ReferenceCallback) common
 						},
 					},
 				},
-				Required: []string{"publicKey", "address", "extraAllowedIPs", "endpoint"},
+				Required: []string{"publicKey", "addresses", "extraAllowedIPs", "endpoint"},
 			},
 		},
 		Dependencies: []string{},

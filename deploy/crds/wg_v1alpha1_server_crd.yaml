@@ -4,6 +4,14 @@ metadata:
   creationTimestamp: null
   name: servers.wg.krakensystems.co
 spec:
+  additionalPrinterColumns:
+  - JSONPath: .spec.publicKey
+    description: Public key for this node
+    name: PublicKey
+    type: string
+  - JSONPath: .metadata.creationTimestamp
+    name: Age
+    type: date
   group: wg.krakensystems.co
   names:
     kind: Server
@@ -13,14 +21,6 @@ spec:
   scope: Namespaced
   subresources:
     status: {}
-  additionalPrinterColumns:
-    - name: PublicKey
-      type: string
-      description: Public key for this node
-      JSONPath: .spec.publicKey
-    - name: Age
-      type: date
-      JSONPath: .metadata.creationTimestamp
   validation:
     openAPIV3Schema:
       properties:
@@ -32,19 +32,39 @@ spec:
           type: object
         spec:
           properties:
-            address:
-              type: string
+            addresses:
+              items:
+                type: string
+              type: array
+            dns:
+              items:
+                type: string
+              type: array
             endpoint:
               type: string
             extraAllowedIPs:
               items:
                 type: string
               type: array
+            mtu:
+              format: int64
+              type: integer
+            postDown:
+              type: string
+            postUp:
+              type: string
+            preDown:
+              type: string
+            preUp:
+              type: string
             publicKey:
               type: string
+            table:
+              format: int64
+              type: integer
           required:
           - publicKey
-          - address
+          - addresses
           - extraAllowedIPs
           - endpoint
           type: object
