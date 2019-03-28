@@ -3,19 +3,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/KrakenSystems/wg-operator/pkg/controller/client"
-	"github.com/KrakenSystems/wg-operator/pkg/controller/server"
-	"github.com/KrakenSystems/wg-operator/pkg/wgctl"
-	"github.com/go-logr/logr"
-	"github.com/sirupsen/logrus"
 	"os"
 	"runtime"
 
 	"github.com/KrakenSystems/wg-operator/pkg/apis"
+	"github.com/KrakenSystems/wg-operator/pkg/controller/node"
+	"github.com/KrakenSystems/wg-operator/pkg/logrAdapter"
 	"github.com/operator-framework/operator-sdk/pkg/k8sutil"
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
-	"github.com/spf13/pflag"
-	// _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/pflag" // _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -24,8 +21,7 @@ import (
 
 // Change below variables to serve metrics on different host or port.
 var (
-	metricsHost       = "0.0.0.0"
-	metricsPort int32 = 6060
+	metricsHost = "0.0.0.0"
 )
 var log = logf.Log.WithName("cmd")
 
@@ -33,39 +29,6 @@ func printVersion() {
 	log.Info(fmt.Sprintf("Go Version: %s", runtime.Version()))
 	log.Info(fmt.Sprintf("Go OS/Arch: %s/%s", runtime.GOOS, runtime.GOARCH))
 	log.Info(fmt.Sprintf("Version of operator-sdk: %v", sdkVersion.Version))
-}
-
-type logrusLogf struct {
-	logger logrus.FieldLogger
-}
-
-func (l logrusLogf) Info(msg string, keysAndValues ...interface{}) {
-	l.WithValues(keysAndValues...).(logrusLogf).logger.Info(msg)
-}
-
-func (l logrusLogf) Enabled() bool {
-	return true
-}
-
-func (l logrusLogf) Error(err error, msg string, keysAndValues ...interface{}) {
-	o := l.WithValues(keysAndValues...).(logrusLogf)
-	o.logger.WithError(err).Error(msg)
-}
-
-func (l logrusLogf) V(level int) logr.InfoLogger {
-	return l
-}
-
-func (l logrusLogf) WithValues(keysAndValues ...interface{}) logr.Logger {
-	olog := l.logger
-	for i := 0; i < len(keysAndValues); i+=2 {
-		olog = olog.WithField(fmt.Sprint(keysAndValues[i]), keysAndValues[i + 1])
-	}
-	return logrusLogf{olog}
-}
-
-func (l logrusLogf) WithName(name string) logr.Logger {
-	return logrusLogf{l.logger.WithField("name", name)}
 }
 
 func main() {
@@ -82,10 +45,13 @@ func main() {
 	nodeName := pflag.String("node-name", hostname, "hostname")
 	interfaceName := pflag.String("wg-interface", "wg0", "interface to configure")
 	privateKeyFile := pflag.String("wg-private-key-file", "/etc/wireguard/wg0.key", "wireguard private key file")
+	metricsPort := pflag.Int("metrics-port", 6060, "metrics port")
+	dryRun := pflag.BoolP("dry-run", "n", false, "Dry run")
+	syncConfigPath := pflag.String("sync-config-path", "", "if set syncs most recently applied config to this location")
 
 	pflag.Parse()
 
-	logf.SetLogger(logrusLogf{logrus.WithField("name", "wg-operator")})
+	logf.SetLogger(logrAdapter.NewLogrusAdapter(logrus.WithField("name", "wg-operator")))
 	logrus.SetLevel(logrus.TraceLevel)
 
 	printVersion()
@@ -106,7 +72,7 @@ func main() {
 	// Create a new Cmd to provide shared dependencies and start components
 	mgr, err := manager.New(cfg, manager.Options{
 		Namespace:          namespace,
-		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, metricsPort),
+		MetricsBindAddress: fmt.Sprintf("%s:%d", metricsHost, *metricsPort),
 	})
 	if err != nil {
 		log.Error(err, "")
@@ -121,31 +87,32 @@ func main() {
 		os.Exit(1)
 	}
 
-	wg := &wgctl.WireguardSetup{
+	ctlCfg := node.NodeControllerConfig{
 		NodeName:       *nodeName,
 		InterfaceName:  *interfaceName,
 		PrivateKeyFile: *privateKeyFile,
+		Namespace:      namespace,
+		DryRun:         *dryRun,
+		SyncConfigPath: *syncConfigPath,
 	}
+
 	switch *mode {
 	case "client":
 		log.Info("Running in client mode", "name", *nodeName)
-		if err := client.Add(mgr, wg); err != nil {
-			log.Error(err, "")
-			os.Exit(1)
-		}
+		ctlCfg.Mode = node.Client
 	case "server":
 		log.Info("Running in server mode", "name", *nodeName)
-		if err := server.Add(mgr, wg); err != nil {
-			log.Error(err, "")
-			os.Exit(1)
-		}
+		ctlCfg.Mode = node.Server
 	default:
 		log.Info("unknown mode: " + *mode)
 		os.Exit(5)
 	}
-	log.Info("Starting the Cmd.")
 
-	// Start the Cmd
+	if err := node.Add(mgr, ctlCfg); err != nil {
+		log.Error(err, "Cannot add node controller")
+		os.Exit(6)
+	}
+	log.Info("Starting the Cmd.")
 	if err := mgr.Start(signals.SetupSignalHandler()); err != nil {
 		log.Error(err, "Manager exited non-zero")
 		os.Exit(1)

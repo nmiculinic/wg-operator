@@ -296,7 +296,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:c2a1bdcd34b920c99951a929edcdbf46f641495b9a6a6f9d6945ff981e207d67"
+  digest = "1:dc6cf7f9c1c5b0e11d239dab1d827ff63e77fe20ba52881a1e6bde2a3f1af66b"
   name = "github.com/mdlayher/wireguardctrl"
   packages = [
     ".",
@@ -306,7 +306,7 @@
     "wgtypes",
   ]
   pruneopts = "NT"
-  revision = "fcf15c501b90233b93206fbaf0373982e3cd15a8"
+  revision = "574321a84e4c415a036522f2a49189f09e5ae3e0"
 
 [[projects]]
   digest = "1:2f42fa12d6911c7b7659738758631bec870b7e9b4c6be5444f963cdcfccc191f"
@@ -326,22 +326,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:008e9b63a14e9070d0af9c145d2ba0720636dbac66d2bcb4bfdaf09a93ae14ce"
+  digest = "1:370913757e8e9e7b9b17387fe0e55029cc2b2cf26deb934322aa6aaf10210969"
   name = "github.com/nmiculinic/wg-quick-go"
   packages = ["."]
   pruneopts = "NT"
-  revision = "c5eb6a3cfaf73895dc1f1874fcb5b8ccf66508ad"
+  revision = "940aafb98dcac630b41e35175d8b03ad67a2f66a"
 
 [[projects]]
   branch = "master"
-  digest = "1:afbc22826491c47d59cc85d27be704fb82a479064d774d3ce58a131bf2426141"
+  digest = "1:5f10ebb985f080702685a1f3e45431d3815c6c7d794f2ad75bcf42faaea3cf75"
   name = "github.com/operator-framework/operator-sdk"
   packages = [
     "pkg/k8sutil",
     "version",
   ]
   pruneopts = "NT"
-  revision = "b7dd8232e32c2a25c10ad37e4b28fd3bf90717dd"
+  revision = "73a4bbdd81e37290e73bfea378259ceafd080127"
 
 [[projects]]
   digest = "1:93b1d84c5fa6d1ea52f4114c37714cddd84d5b78f151b62bb101128dd51399bf"
@@ -374,14 +374,6 @@
   pruneopts = "NT"
   revision = "ba968bfe8b2f7e042a574c888954fccecfa385b4"
   version = "v0.8.1"
-
-[[projects]]
-  digest = "1:0028cb19b2e4c3112225cd871870f2d9cf49b9b4276531f03438a88e94be86fe"
-  name = "github.com/pmezard/go-difflib"
-  packages = ["difflib"]
-  pruneopts = "NT"
-  revision = "792786c7400a136282c1664665ae0a8db921c6c2"
-  version = "v1.0.0"
 
 [[projects]]
   digest = "1:ec2a29e3bd141038ae5c3d3a4f57db0c341fcc1d98055a607aedd683aed124ee"
@@ -469,14 +461,6 @@
   version = "v1.0.3"
 
 [[projects]]
-  digest = "1:8e8fc2cb42cfa0a18fda0c9c4034092faa7aac773da5efdde8828eb4b96c001d"
-  name = "github.com/stretchr/testify"
-  packages = ["assert"]
-  pruneopts = "NT"
-  revision = "ffdc059bfe9ce6a4e144ba849dbedead332c6053"
-  version = "v1.3.0"
-
-[[projects]]
   digest = "1:936ab0fd3f16edc83131e626594a4f4e75426e5adeb7adbe57ed203db4c1b950"
   name = "github.com/vishvananda/netlink"
   packages = [
@@ -539,7 +523,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:cb9478be67a90ad22552f60d66df94b9ed4158e171fe9b43a589a64b96afdafb"
+  digest = "1:f9d2f13baed365df2f09249c839e783cc66ff4f5287d1399a2d558e4ffe7f106"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -551,7 +535,7 @@
     "idna",
   ]
   pruneopts = "NT"
-  revision = "15845e8f865bdabdefb6e7da65b4d9e8de5e94ef"
+  revision = "710a502c58a2a4b2d7417a4e24ccb96d8dc13fa3"
 
 [[projects]]
   branch = "master"
@@ -609,7 +593,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:390d47c196e51bd0496c5bd15459c36a637b267c874b9b46f95442bcff680d74"
+  digest = "1:728cd187189ebcc7626ec729c0d98a3cef5ba0ed85d5670a326fb2867ed39bd1"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -625,7 +609,7 @@
     "internal/semver",
   ]
   pruneopts = "NT"
-  revision = "1d95b17f1b046c395bb6a29c453b501d267151d3"
+  revision = "dbeab5af4b8d3204d444b78cafaba18a9a062a50"
 
 [[projects]]
   digest = "1:711179d92dbef98932acd7afd0dab80b4cf2d97f099f3285c9ba8fa451809fec"
@@ -974,9 +958,9 @@
     "github.com/nmiculinic/wg-quick-go",
     "github.com/operator-framework/operator-sdk/pkg/k8sutil",
     "github.com/operator-framework/operator-sdk/version",
+    "github.com/pkg/errors",
     "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",
-    "github.com/stretchr/testify/assert",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/runtime/schema",

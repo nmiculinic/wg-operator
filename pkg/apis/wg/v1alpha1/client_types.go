@@ -1,6 +1,8 @@
 package v1alpha1
 
 import (
+	"github.com/mdlayher/wireguardctrl/wgtypes"
+	"github.com/nmiculinic/wg-quick-go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -15,6 +17,18 @@ type ClientSpec struct {
 	// Add custom validation using kubebuilder tags: https://book.kubebuilder.io/beyond_basics/generating_crd.html
 
 	CommonSpec `json:",inline"`
+}
+
+var _ VPNNode = (*Client)(nil)
+
+func (*Client) isNode() {}
+
+func (client *Client) ToPeerConfig() (wgtypes.PeerConfig, error) {
+	return client.Spec.CommonSpec.toPeerConfig()
+}
+
+func (client *Client) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error) {
+	return client.Spec.CommonSpec.toInterfaceConfig(privateKeyFile)
 }
 
 // ClientStatus defines the observed state of Client

@@ -23,7 +23,12 @@ go_build:
     # When using dind, it's wise to use the overlayfs driver for
     # improved performance.
     # DOCKER_DRIVER: overlay2
+    CGO_ENABLED: 0
   before_script:
+    - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
+    - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
+    - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
+    - docker info
     - go env
     - mkdir ~/.docker || true
     - echo $DOCKER_CONFIG | base64 -d > ~/.docker/config.json
@@ -37,10 +42,6 @@ go_build:
     - pwd
     - ls
     - go get github.com/golang/dep/cmd/dep  # Install dep
-    - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
-    - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
-    - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
-    - docker info
     - cd $GO_PROJECT_PATH
     - pwd
     - ls
@@ -53,14 +54,15 @@ go_build:
     - export GOCACHE=${CI_PROJECT_DIR}/.cache
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
+    - go env
     - go test ./...
-    - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-amd64 ./cmd/manager
+    - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-amd64 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM alpine
       WORKDIR /bin
-      COPY build/${CI_PROJECT_PATH}-amd64 /bin/${CI_PROJECT_PATH}
-      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      COPY build/${CI_PROJECT_NAME}-amd64 /bin/${CI_PROJECT_NAME}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_NAME}" ]
       EOF
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-amd64 -f pack.Dockerfile .
@@ -68,13 +70,13 @@ go_build:
     - docker build -t ${IMAGE_BRANCH}-amd64 -f pack.Dockerfile .
     - docker push ${IMAGE_BRANCH}-amd64
     - echo "========="
-    - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm32v7 ./cmd/manager
+    - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-arm32v7 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm32v7/alpine
       WORKDIR /bin
-      COPY build/${CI_PROJECT_PATH}-arm32v7 /bin/${CI_PROJECT_PATH}
-      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      COPY build/${CI_PROJECT_NAME}-arm32v7 /bin/${CI_PROJECT_NAME}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_NAME}" ]
       EOF
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-arm32v7 -f pack.Dockerfile .
@@ -82,13 +84,13 @@ go_build:
     - docker build -t ${IMAGE_BRANCH}-arm32v7 -f pack.Dockerfile .
     - docker push ${IMAGE_BRANCH}-arm32v7
     - echo "========="
-    - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
+    - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-arm64v8 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm64v8/alpine
       WORKDIR /bin
-      COPY build/${CI_PROJECT_PATH}-arm64v8 /bin/${CI_PROJECT_PATH}
-      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      COPY build/${CI_PROJECT_NAME}-arm64v8 /bin/${CI_PROJECT_NAME}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_NAME}" ]
       EOF
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-arm64v8 -f pack.Dockerfile .
