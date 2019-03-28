@@ -8,7 +8,7 @@ variables:
 
 go_build:
   variables:
-    # DOCKERVERSION: 18.09.3
+    DOCKERVERSION: 18.09.3
     # When using dind service we need to instruct docker, to talk with the
     # daemon started inside of the service. The daemon is available with
     # a network connection instead of the default /var/run/docker.sock socket.
