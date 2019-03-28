@@ -1,3 +1,4 @@
+[![Build Status](https://gitlab.com/neven-miculinic/wg-operator/badges/master/pipeline.svg)](https://gitlab.com/neven-miculinic/wg-operator/pipelines) [![GoDoc](https://godoc.org/github.com/KrakenSystems/wireguardctrl?status.svg)](https://godoc.org/github.com/KrakenSystems/wg-operator) [![Go Report Card](https://goreportcard.com/badge/github.com/KrakenSystems/wg-operator)](https://goreportcard.com/report/github.com/KrakenSystems/wg-operator)
 # wg-operator
 
 This project aim to dynamically reconfigure wireguard on the fly for the cluster nodes.

@@ -7,7 +7,7 @@ import (
 )
 
 func NewLogrusAdapter(l logrus.FieldLogger) logr.Logger {
-	return &logrusLogf{logger:l}
+	return &logrusLogf{logger: l}
 }
 
 type logrusLogf struct {
@@ -33,8 +33,8 @@ func (l logrusLogf) V(level int) logr.InfoLogger {
 
 func (l logrusLogf) WithValues(keysAndValues ...interface{}) logr.Logger {
 	olog := l.logger
-	for i := 0; i < len(keysAndValues); i+=2 {
-		olog = olog.WithField(fmt.Sprint(keysAndValues[i]), keysAndValues[i + 1])
+	for i := 0; i < len(keysAndValues); i += 2 {
+		olog = olog.WithField(fmt.Sprint(keysAndValues[i]), keysAndValues[i+1])
 	}
 	return logrusLogf{olog}
 }
