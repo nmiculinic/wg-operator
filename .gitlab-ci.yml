@@ -47,14 +47,14 @@ go_build:
   services:
     - docker:dind
   stage: build
-  image: golang:1.12
+  image: golang:1.12-alpine
   script:
     - mkdir -p .cache
     - export GOCACHE=${CI_PROJECT_DIR}/.cache
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
     - go test ./...
-    - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-amd64 ./cmd/manager
+    - GOOS=linux GOARCH=amd64 go build -o build/${CI_PROJECT_NAME}-amd64 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM alpine
@@ -68,7 +68,7 @@ go_build:
     - docker build -t ${IMAGE_BRANCH}-amd64 -f pack.Dockerfile .
     - docker push ${IMAGE_BRANCH}-amd64
     - echo "========="
-    - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-arm32v7 ./cmd/manager
+    - GOOS=linux GOARCH=arm GOARM=7 go build -o build/${CI_PROJECT_NAME}-arm32v7 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm32v7/alpine
@@ -82,7 +82,7 @@ go_build:
     - docker build -t ${IMAGE_BRANCH}-arm32v7 -f pack.Dockerfile .
     - docker push ${IMAGE_BRANCH}-arm32v7
     - echo "========="
-    - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-arm64v8 ./cmd/manager
+    - GOOS=linux GOARCH=arm64 go build -o build/${CI_PROJECT_NAME}-arm64v8 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm64v8/alpine
