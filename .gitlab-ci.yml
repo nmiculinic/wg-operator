@@ -24,7 +24,7 @@ go_build:
     # improved performance.
     # DOCKER_DRIVER: overlay2
   before_script:
-    - apk update && apk add git docker
+    - apk update && apk add git docker gcc make
     # - echo https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     # - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     # - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
