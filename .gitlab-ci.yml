@@ -54,13 +54,13 @@ go_build:
     - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - dep ensure -vendor-only
     - go test ./...
-    - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-amd64 ./cmd/manager
+    - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-amd64 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM alpine
       WORKDIR /bin
-      COPY build/${CI_PROJECT_PATH}-amd64 /bin/${CI_PROJECT_PATH}
-      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      COPY build/${CI_PROJECT_NAME}-amd64 /bin/${CI_PROJECT_NAME}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_NAME}" ]
       EOF
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-amd64 -f pack.Dockerfile .
@@ -68,13 +68,13 @@ go_build:
     - docker build -t ${IMAGE_BRANCH}-amd64 -f pack.Dockerfile .
     - docker push ${IMAGE_BRANCH}-amd64
     - echo "========="
-    - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm32v7 ./cmd/manager
+    - GOOS=linux GOARCH=arm GOARM=7 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-arm32v7 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm32v7/alpine
       WORKDIR /bin
-      COPY build/${CI_PROJECT_PATH}-arm32v7 /bin/${CI_PROJECT_PATH}
-      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      COPY build/${CI_PROJECT_NAME}-arm32v7 /bin/${CI_PROJECT_NAME}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_NAME}" ]
       EOF
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-arm32v7 -f pack.Dockerfile .
@@ -82,13 +82,13 @@ go_build:
     - docker build -t ${IMAGE_BRANCH}-arm32v7 -f pack.Dockerfile .
     - docker push ${IMAGE_BRANCH}-arm32v7
     - echo "========="
-    - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_PATH}-arm64v8 ./cmd/manager
+    - GOOS=linux GOARCH=arm64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-arm64v8 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
       FROM arm64v8/alpine
       WORKDIR /bin
-      COPY build/${CI_PROJECT_PATH}-arm64v8 /bin/${CI_PROJECT_PATH}
-      ENTRYPOINT [ "/bin/${CI_PROJECT_PATH}" ]
+      COPY build/${CI_PROJECT_NAME}-arm64v8 /bin/${CI_PROJECT_NAME}
+      ENTRYPOINT [ "/bin/${CI_PROJECT_NAME}" ]
       EOF
     - cat pack.Dockerfile
     - docker build -t ${IMAGE_FULL}-arm64v8 -f pack.Dockerfile .
