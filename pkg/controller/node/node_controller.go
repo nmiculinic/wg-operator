@@ -9,6 +9,7 @@ import (
 
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
 	"github.com/mdlayher/wireguardctrl/wgtypes"
+	"github.com/nmiculinic/wg-quick-go"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -190,7 +191,7 @@ func (r *nodeController) refresh() error {
 		log.Info("Dry run, not applying config!")
 		return nil
 	}
-	if err := cfg.Sync(r.InterfaceName, log); err != nil {
+	if err := wgquick.Sync(cfg, r.InterfaceName, log); err != nil {
 		return err
 	}
 	if r.SyncConfigPath != "" {
