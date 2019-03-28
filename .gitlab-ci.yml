@@ -29,33 +29,18 @@ go_build:
     - curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz
     - tar xzvf docker-${DOCKERVERSION}.tgz --strip 1 -C /usr/local/bin docker/docker
     - docker info
-    - go env
-    - mkdir ~/.docker || true
-    - echo $DOCKER_CONFIG | base64 -d > ~/.docker/config.json
-    - cat ~/.docker/config.json | wc
-    - mkdir -p $GOPATH/src/github.com/KrakenSystems/
-    - cd $GOPATH/src/github.com/KrakenSystems/
-    - ln -s $CI_PROJECT_DIR
-    - export GO_PROJECT_PATH="$GOPATH/src/github.com/KrakenSystems/${CI_PROJECT_NAME}"
-    - echo $GO_PROJECT_PATH
-    - cd $GO_PROJECT_PATH
-    - pwd
-    - ls
-    - go get github.com/golang/dep/cmd/dep  # Install dep
-    - cd $GO_PROJECT_PATH
-    - pwd
-    - ls
   services:
     - docker:dind
   stage: build
   image: golang:1.12
   script:
-    - mkdir -p .cache
-    - export GOCACHE=${CI_PROJECT_DIR}/.cache
-    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
-    - dep ensure -vendor-only
+    - mkdir -p .cache/cache || true
+    - mkdir -p .cache/go || true
+    - export GOCACHE="$CI_PROJECT_DIR/.cache/cache"
+    - export GOPATH="$CI_PROJECT_DIR/.cache/go"
     - go env
     - go test ./...
+    - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN ${CI_REGISTRY}
     - GOOS=linux GOARCH=amd64 go build -a -ldflags '-extldflags "-static"' -o build/${CI_PROJECT_NAME}-amd64 ./cmd/manager
     - |
       cat << EOF > pack.Dockerfile
