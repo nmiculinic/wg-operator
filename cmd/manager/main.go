@@ -50,6 +50,7 @@ func main() {
 	dryRun := pflag.BoolP("dry-run", "n", false, "Dry run")
 	syncConfigPath := pflag.String("sync-config-path", "/etc/wireguard", "Config file sync location. PATH/<<iface>>.conf")
 	syncConfig := pflag.Bool("sync-config", false, "whether to sync config files")
+	splitServers := pflag.Bool("split-servers", false, "create interface per server. Highly experimental")
 
 	pflag.Parse()
 
@@ -100,6 +101,7 @@ func main() {
 		DryRun:         *dryRun,
 		SyncConfigPath: *syncConfigPath,
 		SyncConfig:     *syncConfig,
+		SplitServers:   *splitServers,
 	}
 
 	switch *mode {

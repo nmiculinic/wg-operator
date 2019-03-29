@@ -40,6 +40,7 @@ type NodeControllerConfig struct {
 	RouteProto     int
 	RouteTable     int
 	Mode           Mode
+	SplitServers   bool
 	DryRun         bool
 	SyncConfigPath string
 	SyncConfig     bool
@@ -140,6 +141,7 @@ func (r *nodeController) fetchMyself(ctx context.Context) (wgv1alpha1.VPNNode, e
 }
 
 func (r *nodeController) syncConfig(ctx context.Context, cfg *wgquick.Config, iface string, log logrus.FieldLogger) error {
+	log = log.WithField("iface", iface)
 	pub := cfg.PrivateKey.PublicKey()
 	log.Info("read private key", "public key", base64.StdEncoding.EncodeToString(pub[:]))
 
@@ -201,7 +203,16 @@ func (r *nodeController) refresh() error {
 		if err != nil {
 			return fmt.Errorf("cannot generate peer config for server %s: %v", srv.Name, err)
 		}
-		cfg.Peers = []wgtypes.PeerConfig{peer}
+		cfg.Peers = append(cfg.Peers, peer)
+
+		if r.SplitServers {
+			c := cfg
+			c.Peers = []wgtypes.PeerConfig{peer}
+			c.ListenPort = nil
+			if err := r.syncConfig(ctx, c, r.Interface+"-"+srv.Name, log); err != nil {
+				return fmt.Errorf("cannot sync server %s: %v", srv.Name, err)
+			}
+		}
 	}
 
 	if r.Mode == Server {
