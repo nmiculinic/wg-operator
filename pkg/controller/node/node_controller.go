@@ -207,11 +207,13 @@ func (r *nodeController) refresh() error {
 
 		if r.SplitServers {
 			c := cfg
+			oldPeers := c.Peers
 			c.Peers = []wgtypes.PeerConfig{peer}
 			c.ListenPort = nil
 			if err := r.syncConfig(ctx, c, r.Interface+"-"+srv.Name, log); err != nil {
 				return fmt.Errorf("cannot sync server %s: %v", srv.Name, err)
 			}
+			c.Peers = oldPeers
 		}
 	}
 

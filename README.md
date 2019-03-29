@@ -10,8 +10,8 @@ See `/deploy` folder. Apply CRDs, that is under `/deploy/crds`. Example servers/
 ## Goals
 
 * [x] Basic client-server VPN paradigm
-* [ ] Implement IPtables masqerading for out of VPN IPs
-* [ ] Highly scalable for clients (i.e. supporting 1000+ clients with minimal resource usage on client side)
+* [ ] Implement IPtables masqerading for out of VPN IPs --> use preUp/postDown for now, and wg-quick or wg-quick-go to run them at system boot.
+* [ ] Highly scalable for clients (i.e. supporting 1000+ clients with minimal resource usage on client side). For mostly static topologies this should be quite performant.
     * [x] update coalescing --> implemented via 200ms coalescing time window
     * [ ] error exponential backoff --> Not implemented, on error we retry every 5 seconds
     * [ ] client query only myself --> partially implemeted, informer cache is fetching all client changes, but update is triggered only for myself
