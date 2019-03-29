@@ -31,6 +31,10 @@ func (client *Client) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config,
 	return client.Spec.CommonSpec.toInterfaceConfig(privateKeyFile)
 }
 
+func (client *Client) NodeName() string {
+	return client.ObjectMeta.Name
+}
+
 // ClientStatus defines the observed state of Client
 // +k8s:openapi-gen=true
 type ClientStatus struct {

@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"io/ioutil"
+	"path"
 	"time"
 
 	wgv1alpha1 "github.com/KrakenSystems/wg-operator/pkg/apis/wg/v1alpha1"
@@ -32,12 +33,16 @@ const (
 
 type NodeControllerConfig struct {
 	NodeName       string
-	InterfaceName  string
+	Interface      string
 	PrivateKeyFile string
 	Namespace      string
+	RouteMetric    int
+	RouteProto     int
+	RouteTable     int
 	Mode           Mode
 	DryRun         bool
 	SyncConfigPath string
+	SyncConfig     bool
 }
 
 func (n *NodeControllerConfig) Create(ev event.CreateEvent) bool {
@@ -74,7 +79,7 @@ func (r *nodeController) Reconcile(request reconcile.Request) (reconcile.Result,
 }
 
 func (ctl *nodeController) Start(done <-chan struct{}) error {
-	log := logrus.WithField("iface", ctl.InterfaceName)
+	log := logrus.WithContext(context.Background())
 	// retry on error
 	// TODO: Added exponential backoff
 	// TODO: extract these times to constants
@@ -115,49 +120,88 @@ func (ctl *nodeController) Start(done <-chan struct{}) error {
 	}
 }
 
-func (r *nodeController) refresh() error {
-	ctx := context.Background()
-	log := logrus.WithField("iface", r.InterfaceName)
-
-	var me wgv1alpha1.VPNNode
+func (r *nodeController) fetchMyself(ctx context.Context) (wgv1alpha1.VPNNode, error) {
 	switch r.Mode {
 	case Server:
 		srvme := &wgv1alpha1.Server{}
 		if err := r.client.Get(ctx, client.ObjectKey{Name: r.NodeName, Namespace: r.Namespace}, srvme); err != nil {
-			return errors.New("cannot find myself -- server")
+			return nil, errors.New("cannot find myself -- server")
 		}
-		me = srvme
+		return srvme, nil
 	case Client:
 		clientMe := &wgv1alpha1.Client{}
 		if err := r.client.Get(ctx, client.ObjectKey{Name: r.NodeName, Namespace: r.Namespace}, clientMe); err != nil {
-			return errors.New("cannot find myself -- client")
+			return nil, errors.New("cannot find myself -- client")
 		}
-		me = clientMe
+		return clientMe, nil
 	default:
-		return errors.New("invalid mode type!")
+		return nil, errors.New("invalid mode type!")
+	}
+}
+
+func (r *nodeController) syncConfig(ctx context.Context, cfg *wgquick.Config, iface string, log logrus.FieldLogger) error {
+	pub := cfg.PrivateKey.PublicKey()
+	log.Info("read private key", "public key", base64.StdEncoding.EncodeToString(pub[:]))
+
+	// set dummy key and log the config with fake private key
+	privKey := cfg.PrivateKey
+	dummyKey := wgtypes.Key([32]byte{0})
+	cfg.PrivateKey = &dummyKey
+	log.Infof("about to apply config:\n%s", cfg.String())
+	cfg.PrivateKey = privKey
+	if r.DryRun {
+		log.Info("Dry run, not applying config!")
+		return nil
+	}
+	if err := wgquick.Sync(cfg, iface, log); err != nil {
+		return err
+	}
+	if r.SyncConfig {
+		m, err := cfg.MarshalText()
+		if err != nil {
+			return fmt.Errorf("cannot marshal config: %v", err)
+		}
+		pp := path.Join(r.SyncConfigPath, iface+".conf")
+		if err := ioutil.WriteFile(pp, m, 0600); err != nil {
+			return fmt.Errorf("cannot write config to %s: %v", pp, err)
+		}
+		log.Infoln("Synced config to disk")
+	}
+	return nil
+}
+
+func (r *nodeController) refresh() error {
+	ctx := context.Background()
+	log := logrus.WithField("iface", r.Interface)
+
+	me, err := r.fetchMyself(ctx)
+	if err != nil {
+		return err
 	}
 
 	cfg, err := me.ToInterfaceConfig(r.PrivateKeyFile)
 	if err != nil {
 		return fmt.Errorf("cannot create interface config: %v", err)
 	}
+	cfg.Table = r.RouteTable
+	cfg.RouteProtocol = r.RouteProto
+	cfg.RouteMetric = r.RouteMetric
 
-	{
-		servers := &wgv1alpha1.ServerList{}
-		if err := r.client.List(ctx, &client.ListOptions{Namespace: r.Namespace}, servers); err != nil {
-			log.Error(err, "cannot list all servers")
-			return err
+	servers := &wgv1alpha1.ServerList{}
+	if err := r.client.List(ctx, &client.ListOptions{Namespace: r.Namespace}, servers); err != nil {
+		log.Error(err, "cannot list all servers")
+		return err
+	}
+
+	for _, srv := range servers.Items {
+		if srv.Name == me.NodeName() {
+			continue
 		}
-		for _, srv := range servers.Items {
-			if srv.Name == r.NodeName {
-				continue
-			}
-			peer, err := srv.ToPeerConfig()
-			if err != nil {
-				return fmt.Errorf("cannot generate peer config for server %s: %v", srv.Name, err)
-			}
-			cfg.Peers = append(cfg.Peers, peer)
+		peer, err := srv.ToPeerConfig()
+		if err != nil {
+			return fmt.Errorf("cannot generate peer config for server %s: %v", srv.Name, err)
 		}
+		cfg.Peers = []wgtypes.PeerConfig{peer}
 	}
 
 	if r.Mode == Server {
@@ -177,34 +221,7 @@ func (r *nodeController) refresh() error {
 		}
 	}
 
-	{
-		// set dummy key and log the config with fake private key
-		privKey := cfg.PrivateKey
-		dummyKey := wgtypes.Key([32]byte{0})
-		cfg.PrivateKey = &dummyKey
-		log.Info(fmt.Sprintf("about to apply config:\n%s", cfg.String()), "iface", r.InterfaceName)
-		cfg.PrivateKey = privKey
-	}
-	pub := cfg.PrivateKey.PublicKey()
-	log.Info("read private key", "public key", base64.StdEncoding.EncodeToString(pub[:]))
-	if r.DryRun {
-		log.Info("Dry run, not applying config!")
-		return nil
-	}
-	if err := wgquick.Sync(cfg, r.InterfaceName, log); err != nil {
-		return err
-	}
-	if r.SyncConfigPath != "" {
-		m, err := cfg.MarshalText()
-		if err != nil {
-			return fmt.Errorf("cannot marshal config: %v", err)
-		}
-		if err := ioutil.WriteFile(r.SyncConfigPath, m, 0600); err != nil {
-			return fmt.Errorf("cannot write config to %s: %v", r.SyncConfigPath, err)
-		}
-		log.Infoln("Synced config to disk")
-	}
-	return nil
+	return r.syncConfig(ctx, cfg, r.Interface, log)
 }
 
 // Add creates a new Client Controller and adds it to the Manager. The Manager will set fields on the Controller
