@@ -55,11 +55,11 @@ func (common *CommonSpec) toPeerConfig() (wgtypes.PeerConfig, error) {
 	}
 
 	for _, cidr := range common.AllowedIPs {
-		_, c, err := net.ParseCIDR(cidr)
+		c, err := parseAddress(cidr)
 		if err != nil {
 			return wgtypes.PeerConfig{}, err
 		}
-		peer.AllowedIPs = append(peer.AllowedIPs, *c)
+		peer.AllowedIPs = append(peer.AllowedIPs, net.IPNet{IP: c.IP.Mask(c.Mask), Mask: c.Mask})
 	}
 	return peer, nil
 }

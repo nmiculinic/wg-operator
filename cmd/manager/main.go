@@ -13,7 +13,6 @@ import (
 	sdkVersion "github.com/operator-framework/operator-sdk/version"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/pflag" // _ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	"golang.org/x/sys/unix"
 	"sigs.k8s.io/controller-runtime/pkg/client/config"
 	"sigs.k8s.io/controller-runtime/pkg/manager"
 	logf "sigs.k8s.io/controller-runtime/pkg/runtime/log"
@@ -47,7 +46,7 @@ func main() {
 	metricsPort := pflag.Int("metrics-port", 6060, "metrics port")
 	metric := pflag.Int("route-metric", 100, "metric to use for routing table")
 	proto := pflag.Int("route-proto", 121, "daemon route table protocol number")
-	table := pflag.Int("route-table", unix.RT_CLASS_MAIN, "daemon route table number")
+	table := pflag.Int("route-table", 0, "daemon route table number")
 	dryRun := pflag.BoolP("dry-run", "n", false, "Dry run")
 	syncConfigPath := pflag.String("sync-config-path", "/etc/wireguard", "Config file sync location. PATH/<<iface>>.conf")
 	syncConfig := pflag.Bool("sync-config", false, "whether to sync config files")
