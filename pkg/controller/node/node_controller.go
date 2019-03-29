@@ -85,7 +85,7 @@ func (ctl *nodeController) Start(done <-chan struct{}) error {
 	// TODO: Added exponential backoff
 	// TODO: extract these times to constants
 	sync := func() {
-		err := ctl.refresh()
+		err := ctl.sync()
 		switch err {
 		case nil:
 			ctl.dirty = false
@@ -172,7 +172,27 @@ func (r *nodeController) syncConfig(ctx context.Context, cfg *wgquick.Config, if
 	return nil
 }
 
-func (r *nodeController) refresh() error {
+func (r *nodeController) allClientPeerConfig(ctx context.Context, me wgv1alpha1.VPNNode, log logrus.FieldLogger) ([]wgtypes.PeerConfig, error) {
+	clients := &wgv1alpha1.ClientList{}
+	if err := r.client.List(ctx, &client.ListOptions{Namespace: r.Namespace}, clients); err != nil {
+		log.Error(err, "cannot list all client")
+	}
+
+	peers := make([]wgtypes.PeerConfig, 0, len(clients.Items))
+	for _, cl := range clients.Items {
+		if cl.Name == (me).(*wgv1alpha1.Server).Name {
+			continue
+		}
+		peer, err := cl.ToPeerConfig()
+		if err != nil {
+			return nil, fmt.Errorf("cannot generate peer config for client %s: %v", cl.Name, err)
+		}
+		peers = append(peers, peer)
+	}
+	return peers, nil
+}
+
+func (r *nodeController) sync() error {
 	ctx := context.Background()
 	log := logrus.WithField("iface", r.Interface)
 
@@ -188,6 +208,13 @@ func (r *nodeController) refresh() error {
 	cfg.Table = r.RouteTable
 	cfg.RouteProtocol = r.RouteProto
 	cfg.RouteMetric = r.RouteMetric
+
+	if r.Mode == Server {
+		cfg.Peers, err = r.allClientPeerConfig(ctx, me, log)
+		if err != nil {
+			return err
+		}
+	}
 
 	servers := &wgv1alpha1.ServerList{}
 	if err := r.client.List(ctx, &client.ListOptions{Namespace: r.Namespace}, servers); err != nil {
@@ -205,7 +232,11 @@ func (r *nodeController) refresh() error {
 		}
 		cfg.Peers = append(cfg.Peers, peer)
 
+		// TODO: refactor this, it's kinda uglish
 		if r.SplitServers {
+			if r.Mode != Client {
+				return fmt.Errorf("split-servers only supported in client mode")
+			}
 			c := cfg
 			oldPeers := c.Peers
 			c.Peers = []wgtypes.PeerConfig{peer}
@@ -217,21 +248,9 @@ func (r *nodeController) refresh() error {
 		}
 	}
 
-	if r.Mode == Server {
-		clients := &wgv1alpha1.ClientList{}
-		if err := r.client.List(ctx, &client.ListOptions{Namespace: r.Namespace}, clients); err != nil {
-			log.Error(err, "cannot list all client")
-		}
-		for _, cl := range clients.Items {
-			if cl.Name == (me).(*wgv1alpha1.Server).Name {
-				continue
-			}
-			peer, err := cl.ToPeerConfig()
-			if err != nil {
-				return fmt.Errorf("cannot generate peer config for client %s: %v", cl.Name, err)
-			}
-			cfg.Peers = append(cfg.Peers, peer)
-		}
+	// No need for generic interface, we're split all client -> server iface over separate interfaces
+	if r.SplitServers && r.Mode == Client {
+		return nil
 	}
 
 	return r.syncConfig(ctx, cfg, r.Interface, log)
