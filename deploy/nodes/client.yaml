@@ -1,7 +1,7 @@
 apiVersion: wg.krakensystems.co/v1alpha1
 kind: Client
 metadata:
-  name: cl1
+  name: client
   annotations:
     priv-key: |
       wg-operator (wireguardctl) ✗ wg genkey | tee /dev/stderr | wg pubkey
@@ -9,6 +9,8 @@ metadata:
       oj/x/PIWqBGgE7NQqtum4ZD+2vruwRmcuTl8/VWwPnc=
 spec:
   publicKey: oj/x/PIWqBGgE7NQqtum4ZD+2vruwRmcuTl8/VWwPnc=
-  address: "10.102.0.10"
-  extraAllowedIPs: []
+  addresses:
+  - "10.102.0.10"
+  allowedIPs:
+  - "10.102.0.10"
   preUp: "echo I'm alive"

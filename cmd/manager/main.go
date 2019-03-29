@@ -38,16 +38,19 @@ func main() {
 		os.Exit(2)
 	}
 
-	// Add flags registered by imported packages (e.g. glog and
-	// controller-runtime)
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	mode := pflag.String("mode", "client", "mode the controller is in (server/client)")
 	nodeName := pflag.String("node-name", hostname, "hostname")
-	interfaceName := pflag.String("wg-interface", "wg0", "interface to configure")
+	iface := pflag.String("wg-interface", "wg0", "interface to configure")
 	privateKeyFile := pflag.String("wg-private-key-file", "/etc/wireguard/wg0.key", "wireguard private key file")
 	metricsPort := pflag.Int("metrics-port", 6060, "metrics port")
+	metric := pflag.Int("route-metric", 100, "metric to use for routing table")
+	proto := pflag.Int("route-proto", 121, "daemon route table protocol number")
+	table := pflag.Int("route-table", 0, "daemon route table number")
 	dryRun := pflag.BoolP("dry-run", "n", false, "Dry run")
-	syncConfigPath := pflag.String("sync-config-path", "", "if set syncs most recently applied config to this location")
+	syncConfigPath := pflag.String("sync-config-path", "/etc/wireguard", "Config file sync location. PATH/<<iface>>.conf")
+	syncConfig := pflag.Bool("sync-config", false, "whether to sync config files")
+	splitServers := pflag.Bool("split-servers", false, "create interface per server. Highly experimental")
 
 	pflag.Parse()
 
@@ -89,11 +92,16 @@ func main() {
 
 	ctlCfg := node.NodeControllerConfig{
 		NodeName:       *nodeName,
-		InterfaceName:  *interfaceName,
+		Interface:      *iface,
 		PrivateKeyFile: *privateKeyFile,
 		Namespace:      namespace,
+		RouteMetric:    *metric,
+		RouteProto:     *proto,
+		RouteTable:     *table,
 		DryRun:         *dryRun,
 		SyncConfigPath: *syncConfigPath,
+		SyncConfig:     *syncConfig,
+		SplitServers:   *splitServers,
 	}
 
 	switch *mode {

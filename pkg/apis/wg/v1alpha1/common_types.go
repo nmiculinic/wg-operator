@@ -13,20 +13,22 @@ import (
 type VPNNode interface {
 	ToPeerConfig() (wgtypes.PeerConfig, error)
 	ToInterfaceConfig(privateKeyFile string) (*wgquick.Config, error)
+	NodeName() string
 	isNode()
 }
 
 type CommonSpec struct {
-	PublicKey       string   `json:"publicKey"`
-	Addresses       []string `json:"addresses"`
-	DNS             []string `json:"dns,omitempty"`
-	ExtraAllowedIPs []string `json:"extraAllowedIPs"`
-	PreUp           string   `json:"preUp,omitempty"`
-	PostUp          string   `json:"postUp,omitempty"`
-	PreDown         string   `json:"preDown,omitempty"`
-	PostDown        string   `json:"postDown,omitempty"`
-	MTU             int      `json:"mtu,omitempty"`
-	Table           int      `json:"table,omitempty"`
+	PublicKey string   `json:"publicKey"`
+	Addresses []string `json:"addresses"`
+	DNS       []string `json:"dns,omitempty"`
+	// Each Address/32 is appended to allowedIPs
+	AllowedIPs []string `json:"allowedIPs"`
+	PreUp      string   `json:"preUp,omitempty"`
+	PostUp     string   `json:"postUp,omitempty"`
+	PreDown    string   `json:"preDown,omitempty"`
+	PostDown   string   `json:"postDown,omitempty"`
+	MTU        int      `json:"mtu,omitempty"`
+	Table      int      `json:"table,omitempty"`
 }
 
 func parseAddress(addr string) (*net.IPNet, error) {
@@ -49,23 +51,15 @@ func (common *CommonSpec) toPeerConfig() (wgtypes.PeerConfig, error) {
 	peer := wgtypes.PeerConfig{
 		ReplaceAllowedIPs: true,
 		PublicKey:         srvKey,
-		AllowedIPs:        make([]net.IPNet, 0, 1+len(common.ExtraAllowedIPs)),
+		AllowedIPs:        make([]net.IPNet, 0, len(common.AllowedIPs)),
 	}
 
-	for _, addr := range common.Addresses {
-		a, err := parseAddress(addr)
-		if err != nil {
-			return wgtypes.PeerConfig{}, fmt.Errorf("cannot parse %s: %v", addr, err)
-		}
-		peer.AllowedIPs = append(peer.AllowedIPs, net.IPNet{IP: a.IP.Mask(a.Mask), Mask: a.Mask})
-	}
-
-	for _, cidr := range common.ExtraAllowedIPs {
-		_, c, err := net.ParseCIDR(cidr)
+	for _, cidr := range common.AllowedIPs {
+		c, err := parseAddress(cidr)
 		if err != nil {
 			return wgtypes.PeerConfig{}, err
 		}
-		peer.AllowedIPs = append(peer.AllowedIPs, *c)
+		peer.AllowedIPs = append(peer.AllowedIPs, net.IPNet{IP: c.IP.Mask(c.Mask), Mask: c.Mask})
 	}
 	return peer, nil
 }

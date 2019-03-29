@@ -1,11 +1,12 @@
 apiVersion: wg.krakensystems.co/v1alpha1
 kind: Server
 metadata:
-  name: k8s-1
+  name: server
 spec:
   publicKey: MBcS+pzcbBkTQUA8bO4UsJ3Xu+I3LusEuOnXsXWUC3s=
-  address: "10.102.0.1"
-  extraAllowedIPs:
+  addresses:
+  - "10.102.0.1"
+  allowedIPs:
+  - "10.102.0.1"
   - "10.100.0.0/14"
-  endpoint: 148.251.236.7:5555
-
+  endpoint: 123.123.123.123:5555

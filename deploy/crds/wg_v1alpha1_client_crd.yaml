@@ -36,11 +36,11 @@ spec:
               items:
                 type: string
               type: array
-            dns:
+            allowedIPs:
               items:
                 type: string
               type: array
-            extraAllowedIPs:
+            dns:
               items:
                 type: string
               type: array
@@ -63,7 +63,7 @@ spec:
           required:
           - publicKey
           - addresses
-          - extraAllowedIPs
+          - allowedIPs
           type: object
         status:
           type: object

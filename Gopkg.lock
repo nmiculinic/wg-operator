@@ -42,15 +42,15 @@
   version = "v1.1.1"
 
 [[projects]]
-  digest = "1:72b009535c54eaab2470f404bf0a5daa44eb3573852b3bd984d8c9e02744de04"
+  digest = "1:1302bdd23af4264a095d48c2c28660a8ecf2e02454ce172cef5cb946029a1383"
   name = "github.com/emicklei/go-restful"
   packages = [
     ".",
     "log",
   ]
   pruneopts = "NT"
-  revision = "9515831d76ca49d15259dccc9765695125d1127e"
-  version = "v2.9.2"
+  revision = "b9bbc5664f49b6deec52393bd68f39830687a347"
+  version = "v2.9.3"
 
 [[projects]]
   digest = "1:81466b4218bf6adddac2572a30ac733a9255919bc2f470b4827a317bd4ee1756"
@@ -296,7 +296,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:dc6cf7f9c1c5b0e11d239dab1d827ff63e77fe20ba52881a1e6bde2a3f1af66b"
+  digest = "1:15f258e9fc07b1b0e513442dfce2113cb50a247a70c0718bec328c243c1b363d"
   name = "github.com/mdlayher/wireguardctrl"
   packages = [
     ".",
@@ -306,7 +306,7 @@
     "wgtypes",
   ]
   pruneopts = "NT"
-  revision = "574321a84e4c415a036522f2a49189f09e5ae3e0"
+  revision = "9e6224e4f8a61e71ff42490fa333319006d884fd"
 
 [[projects]]
   digest = "1:2f42fa12d6911c7b7659738758631bec870b7e9b4c6be5444f963cdcfccc191f"
@@ -326,22 +326,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:d1240dd47156df078a54dbaf1bde03cb706c9548e28a0ac42bcc535ee3583196"
+  digest = "1:25fcf800efa89808752c72014978b7b7cebd6f372826d401a4e849e44716468b"
   name = "github.com/nmiculinic/wg-quick-go"
   packages = ["."]
   pruneopts = "NT"
-  revision = "5f01824316703cfdc9b8d722428aa5d680c70721"
+  revision = "d80ea58156ebd20f1d2659bff4dd37f8176652f6"
 
 [[projects]]
   branch = "master"
-  digest = "1:454bd9a93c12b52b8bfc94f6d61c5026b7e1a366a893bb420dd47a6656a81379"
+  digest = "1:1cc09ef62949757cd67d720faaa05708b8573e37d8c62c12480a96c88a349342"
   name = "github.com/operator-framework/operator-sdk"
   packages = [
     "pkg/k8sutil",
     "version",
   ]
   pruneopts = "NT"
-  revision = "147862c0001d2d4c06fe06193f35f3b94ba94761"
+  revision = "4564a35d12c7a9b2d9873751084c1a38879a4061"
 
 [[projects]]
   digest = "1:93b1d84c5fa6d1ea52f4114c37714cddd84d5b78f151b62bb101128dd51399bf"
@@ -409,17 +409,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:412affe2853f32d2b75fc1beaec432e220945cb593d7b8718059c5029c9db60c"
+  digest = "1:9b88d30d00199d49df4290b275cdd9be4871d1e9bdac2b2030880c7d9fc3c522"
   name = "github.com/prometheus/procfs"
-  packages = [
-    ".",
-    "internal/util",
-    "iostats",
-    "nfs",
-    "xfs",
-  ]
+  packages = ["."]
   pruneopts = "NT"
-  revision = "55ae3d9d557340b5bc24cd8aa5f6fa2c2ab31352"
+  revision = "af7bedc223fba51343f25a6fa7aba84355d0357a"
 
 [[projects]]
   digest = "1:fcef1ce61da6f8f6f115154fb0e0e5b159fe11656839ba1e6061372711c013ee"
@@ -523,7 +517,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:11e93d94b0ff36f8f6165e2543ccab8773e5e55a185085e0f3c9bdd8acffa065"
+  digest = "1:318eeba3eb64a2c2b6fdaa988b6d08dadde9ec7b6ff909d72dd87735be65f7d9"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -535,7 +529,7 @@
     "idna",
   ]
   pruneopts = "NT"
-  revision = "63eda1eb0650888965ead1296efd04d0b2b61128"
+  revision = "74de082e2cca95839e88aa0aeee5aadf6ce7710f"
 
 [[projects]]
   branch = "master"
@@ -550,14 +544,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:9d531f81319846d063202616c0dd87bbf03b7f15c23136cba085b2b79432b4ec"
+  digest = "1:d758a7035f59cc59b8b1380e0dcfdde798bee43db2156a2f24f37edf2d575fde"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "NT"
-  revision = "f49334f85ddcf0f08d7fb6dd7363e9e6d6b777eb"
+  revision = "9eb1bfa1ce65ae8a6ff3114b0aaf9a41a6cf3560"
 
 [[projects]]
   digest = "1:8c74f97396ed63cc2ef04ebb5fc37bb032871b8fd890a25991ed40974b00cd2a"
@@ -593,7 +587,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:6103b53e455a6085a924ec0f64258dc1a061a7ca63df48f23ca3a9ee05115581"
+  digest = "1:356244c1f8959723c4b014e363eb96f521fc7e2e9f30da5dd7dc58cd66b102b7"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -609,7 +603,7 @@
     "internal/semver",
   ]
   pruneopts = "NT"
-  revision = "8f05a32dce9ff80c9bf11baeb89d26b410f39281"
+  revision = "ab21143f238442efbf2d6acedb69eaddbb43d088"
 
 [[projects]]
   digest = "1:711179d92dbef98932acd7afd0dab80b4cf2d97f099f3285c9ba8fa451809fec"
@@ -961,6 +955,7 @@
     "github.com/pkg/errors",
     "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",
+    "golang.org/x/sys/unix",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/runtime/schema",

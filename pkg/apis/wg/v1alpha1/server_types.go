@@ -51,6 +51,10 @@ func (server *Server) ToInterfaceConfig(privateKeyFile string) (*wgquick.Config,
 	return cfg, nil
 }
 
+func (server *Server) NodeName() string {
+	return server.ObjectMeta.Name
+}
+
 // ServerStatus defines the observed state of Server
 // +k8s:openapi-gen=true
 type ServerStatus struct {

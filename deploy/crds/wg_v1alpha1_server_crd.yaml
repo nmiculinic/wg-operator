@@ -36,16 +36,16 @@ spec:
               items:
                 type: string
               type: array
+            allowedIPs:
+              items:
+                type: string
+              type: array
             dns:
               items:
                 type: string
               type: array
             endpoint:
               type: string
-            extraAllowedIPs:
-              items:
-                type: string
-              type: array
             mtu:
               format: int64
               type: integer
@@ -65,7 +65,7 @@ spec:
           required:
           - publicKey
           - addresses
-          - extraAllowedIPs
+          - allowedIPs
           - endpoint
           type: object
         status:
