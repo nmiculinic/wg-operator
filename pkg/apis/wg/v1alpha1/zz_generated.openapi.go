@@ -103,9 +103,10 @@ func schema_pkg_apis_wg_v1alpha1_ClientSpec(ref common.ReferenceCallback) common
 							},
 						},
 					},
-					"extraAllowedIPs": {
+					"allowedIPs": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "Each Address/32 is appended to allowedIPs",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -153,7 +154,7 @@ func schema_pkg_apis_wg_v1alpha1_ClientSpec(ref common.ReferenceCallback) common
 						},
 					},
 				},
-				Required: []string{"publicKey", "addresses", "extraAllowedIPs"},
+				Required: []string{"publicKey", "addresses", "allowedIPs"},
 			},
 		},
 		Dependencies: []string{},
@@ -253,9 +254,10 @@ func schema_pkg_apis_wg_v1alpha1_ServerSpec(ref common.ReferenceCallback) common
 							},
 						},
 					},
-					"extraAllowedIPs": {
+					"allowedIPs": {
 						SchemaProps: spec.SchemaProps{
-							Type: []string{"array"},
+							Description: "Each Address/32 is appended to allowedIPs",
+							Type:        []string{"array"},
 							Items: &spec.SchemaOrArray{
 								Schema: &spec.Schema{
 									SchemaProps: spec.SchemaProps{
@@ -309,7 +311,7 @@ func schema_pkg_apis_wg_v1alpha1_ServerSpec(ref common.ReferenceCallback) common
 						},
 					},
 				},
-				Required: []string{"publicKey", "addresses", "extraAllowedIPs", "endpoint"},
+				Required: []string{"publicKey", "addresses", "allowedIPs", "endpoint"},
 			},
 		},
 		Dependencies: []string{},

@@ -131,8 +131,8 @@ func (in *CommonSpec) DeepCopyInto(out *CommonSpec) {
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
-	if in.ExtraAllowedIPs != nil {
-		in, out := &in.ExtraAllowedIPs, &out.ExtraAllowedIPs
+	if in.AllowedIPs != nil {
+		in, out := &in.AllowedIPs, &out.AllowedIPs
 		*out = make([]string, len(*in))
 		copy(*out, *in)
 	}
