@@ -2,6 +2,7 @@ package v1alpha1
 
 import (
 	"net"
+	"time"
 
 	"github.com/mdlayher/wireguardctrl/wgtypes"
 	"github.com/nmiculinic/wg-quick-go"
@@ -32,6 +33,8 @@ func (server *Server) ToPeerConfig() (wgtypes.PeerConfig, error) {
 		return wgtypes.PeerConfig{}, err
 	}
 	peer.Endpoint, err = net.ResolveUDPAddr("", server.Spec.Endpoint)
+	keepAlive := 25 * time.Second
+	peer.PersistentKeepaliveInterval = &keepAlive
 	if err != nil {
 		return wgtypes.PeerConfig{}, err
 	}
