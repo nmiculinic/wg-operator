@@ -26,12 +26,12 @@
   version = "1.0.0"
 
 [[projects]]
-  branch = "master"
   digest = "1:c819830f4f5ef85874a90ac3cbcc96cd322c715f5c96fbe4722eacd3dafbaa07"
   name = "github.com/beorn7/perks"
   packages = ["quantile"]
   pruneopts = "NT"
-  revision = "3a771d992973f24aa725d07868b467d1ddfceafb"
+  revision = "4b2b341e8d7715fae06375aa633dbb6e91b3fb46"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:4b8b5811da6970495e04d1f4e98bb89518cc3cfc3b3f456bdb876ed7b6c74049"
@@ -166,12 +166,12 @@
   version = "v1.0.0"
 
 [[projects]]
-  branch = "master"
   digest = "1:52c5834e2bebac9030c97cc0798ac11c3aa8a39f098aeb419f142533da6cd3cc"
   name = "github.com/google/gofuzz"
   packages = ["."]
   pruneopts = "NT"
-  revision = "24818f796faf91cd76ec7bddd72458fbced7a6c1"
+  revision = "f140a6486e521aad38f5917de355cbf147cc0496"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:ab3ec1fe3e39bac4b3ab63390767766622be35b7cab03f47f787f9ec60522a53"
@@ -249,7 +249,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1832b664bdd6ff3139a8590c907044d7d440cd10fa46979d89fe98a11b75b256"
+  digest = "1:782fb677791a7fe7b5b8e637bcf695efb13950ce09e3e8e3b1cf21c57649be7c"
   name = "github.com/mailru/easyjson"
   packages = [
     "buffer",
@@ -257,7 +257,7 @@
     "jwriter",
   ]
   pruneopts = "NT"
-  revision = "1de009706dbeb9d05f18586f0735fcdb7c524481"
+  revision = "1ea4449da9834f4d333f1cc461c374aea217d249"
 
 [[projects]]
   digest = "1:56dbf15e091bf7926cb33a57cb6bdfc658fc6d3498d2f76f10a97ce7856f1fde"
@@ -277,22 +277,22 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:80d76b821ec64bd759ee0b073ba7e22af7e3a5fdbf5f2f8d99c9c1bd819c9c15"
+  digest = "1:c10e1b81e693d84b8c42382a580be1b19f33d5389561ddf39e2e992e2c690bb0"
   name = "github.com/mdlayher/genetlink"
   packages = ["."]
   pruneopts = "NT"
-  revision = "60417448a85124f4b675580ad4186e8776b27d91"
+  revision = "2d43e79ece4908119babbc4ceb5e6b97d536d8e1"
 
 [[projects]]
   branch = "master"
-  digest = "1:ace99ee36754fa463aafc7f478fe3044a15d682cf8d6322e64986bb11f4d3f50"
+  digest = "1:c4ab3808cf5c300cf2e76481f385b7e525f6fa175b509c11af33a649dbf68c02"
   name = "github.com/mdlayher/netlink"
   packages = [
     ".",
     "nlenc",
   ]
   pruneopts = "NT"
-  revision = "258ea9dff42c0ec7540aa4b1599d09e7bfc7973b"
+  revision = "3cae06de9d300dce6b02b6c697d684991de4ad21"
 
 [[projects]]
   branch = "master"
@@ -306,7 +306,7 @@
     "wgtypes",
   ]
   pruneopts = "NT"
-  revision = "9e6224e4f8a61e71ff42490fa333319006d884fd"
+  revision = "5a3fadf5504f4fa1675aae1ef7feabda2261e417"
 
 [[projects]]
   digest = "1:2f42fa12d6911c7b7659738758631bec870b7e9b4c6be5444f963cdcfccc191f"
@@ -334,14 +334,14 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:1cc09ef62949757cd67d720faaa05708b8573e37d8c62c12480a96c88a349342"
+  digest = "1:29bf43ecd02d43977bb41f4e8d86b3bac5e6d4380c888c9503b9f4a288cd342a"
   name = "github.com/operator-framework/operator-sdk"
   packages = [
     "pkg/k8sutil",
     "version",
   ]
   pruneopts = "NT"
-  revision = "4564a35d12c7a9b2d9873751084c1a38879a4061"
+  revision = "6767e9a70b967903db010cf1a3cf9a91cb974731"
 
 [[projects]]
   digest = "1:93b1d84c5fa6d1ea52f4114c37714cddd84d5b78f151b62bb101128dd51399bf"
@@ -396,7 +396,7 @@
   revision = "fd36f4220a901265f90734c3183c5f0c91daa0b8"
 
 [[projects]]
-  digest = "1:30261b5e263b5c4fb40571b53a41a99c96016c6b1b2c45c1cefd226fc3f6304b"
+  digest = "1:f173d6232eefd6f25afe9c603aed065c80adb7e4c9cbc30f534db8792fcebdba"
   name = "github.com/prometheus/common"
   packages = [
     "expfmt",
@@ -404,19 +404,19 @@
     "model",
   ]
   pruneopts = "NT"
-  revision = "cfeb6f9992ffa54aaa4f2170ade4067ee478b250"
-  version = "v0.2.0"
+  revision = "a82f4c12f983cc2649298185f296632953e50d3e"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "master"
-  digest = "1:9b88d30d00199d49df4290b275cdd9be4871d1e9bdac2b2030880c7d9fc3c522"
+  digest = "1:75f1b9f32d4d204eac68f3427bc4642453fb4fe20f1596ec058757f01dc16e7b"
   name = "github.com/prometheus/procfs"
   packages = ["."]
   pruneopts = "NT"
-  revision = "af7bedc223fba51343f25a6fa7aba84355d0357a"
+  revision = "8368d24ba045f26503eb745b624d930cbe214c79"
 
 [[projects]]
-  digest = "1:fcef1ce61da6f8f6f115154fb0e0e5b159fe11656839ba1e6061372711c013ee"
+  digest = "1:a4644e85e1f29f9825a4e61dcdd8244fe7c4db02eead3f508d5a5bdf7924dbbd"
   name = "github.com/rogpeppe/go-internal"
   packages = [
     "modfile",
@@ -424,16 +424,16 @@
     "semver",
   ]
   pruneopts = "NT"
-  revision = "1cf9852c553c5b7da2d5a4a091129a7822fed0c9"
-  version = "v1.2.2"
+  revision = "438578804ca6f31be148c27683afc419ce47c06e"
+  version = "v1.3.0"
 
 [[projects]]
-  digest = "1:c8a0dfc6208c2af75549dbd7a0c4446cc214b7a049a872858a8ec6f58e4fd082"
+  digest = "1:587d2e689ba400b9e4687ed2f02074fbc07fb33fd5ef72d22b5d68ae470f1267"
   name = "github.com/sirupsen/logrus"
   packages = ["."]
   pruneopts = "NT"
-  revision = "dae0fa8d5b0c810a8ab733fbd5510c7cae84eca4"
-  version = "v1.4.0"
+  revision = "8bdbc7bcc01dcbb8ec23dc8a28e332258d25251f"
+  version = "v1.4.1"
 
 [[projects]]
   digest = "1:49b6e0d199dc20969bf7c9d14647313e1dd1b102178fad4ca999d8a9584edfab"
@@ -506,18 +506,18 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:2c0b9b49d155596fecc071bce8db372c193f638265c11ab24914aae99fcfa704"
+  digest = "1:98aa4a4a4f424cde92614ade7dac45f66c898e2acb8973f809cf9a424ec625e9"
   name = "golang.org/x/crypto"
   packages = [
     "curve25519",
     "ssh/terminal",
   ]
   pruneopts = "NT"
-  revision = "a5d413f7728c81fb97d96a2b722368945f651e78"
+  revision = "88737f569e3a9c7ab309cdc09a07fe7fc87233c3"
 
 [[projects]]
   branch = "master"
-  digest = "1:318eeba3eb64a2c2b6fdaa988b6d08dadde9ec7b6ff909d72dd87735be65f7d9"
+  digest = "1:89cf4e2680b312eb7a1b76f32c29089145b639f578b5fcef106c71ee867921f6"
   name = "golang.org/x/net"
   packages = [
     "bpf",
@@ -529,29 +529,29 @@
     "idna",
   ]
   pruneopts = "NT"
-  revision = "74de082e2cca95839e88aa0aeee5aadf6ce7710f"
+  revision = "1da14a5a36f220ea3f03470682b737b1dfd5de22"
 
 [[projects]]
   branch = "master"
-  digest = "1:b84971d4821db3a4e63952059b159d9ff27ea373903d1545b02f7984469c8f92"
+  digest = "1:54c605b4036ec49dbc4c887969128d5ee68140cf0bbec46e67cbb2497e69c15e"
   name = "golang.org/x/oauth2"
   packages = [
     ".",
     "internal",
   ]
   pruneopts = "NT"
-  revision = "c85d3e98c914e3a33234ad863dcbff5dbc425bb8"
+  revision = "9f3314589c9a9136388751d9adae6b0ed400978a"
 
 [[projects]]
   branch = "master"
-  digest = "1:d758a7035f59cc59b8b1380e0dcfdde798bee43db2156a2f24f37edf2d575fde"
+  digest = "1:294ae7778c314e7d9de8d8f651d3e85e74988b92a1ca4e97e2d8ffc345464df9"
   name = "golang.org/x/sys"
   packages = [
     "unix",
     "windows",
   ]
   pruneopts = "NT"
-  revision = "9eb1bfa1ce65ae8a6ff3114b0aaf9a41a6cf3560"
+  revision = "ebb4019f01c946537c3ea6b99f0eca5283552a8f"
 
 [[projects]]
   digest = "1:8c74f97396ed63cc2ef04ebb5fc37bb032871b8fd890a25991ed40974b00cd2a"
@@ -587,7 +587,7 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:356244c1f8959723c4b014e363eb96f521fc7e2e9f30da5dd7dc58cd66b102b7"
+  digest = "1:0fc54553f800dde6ba3df2ba26f4741e327d88c6ae19cab02d89680e51e608fa"
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
@@ -603,7 +603,7 @@
     "internal/semver",
   ]
   pruneopts = "NT"
-  revision = "ab21143f238442efbf2d6acedb69eaddbb43d088"
+  revision = "2e9de471ebd3a3af420e4dd35a826936b94da7f6"
 
 [[projects]]
   digest = "1:711179d92dbef98932acd7afd0dab80b4cf2d97f099f3285c9ba8fa451809fec"
@@ -860,12 +860,12 @@
   revision = "e17681d19d3ac4837a019ece36c2a0ec31ffe985"
 
 [[projects]]
-  digest = "1:29f93bb84d907a2c035e729e19d66fe52165d8c905cb3ef1920140d76ae6afaf"
+  digest = "1:300621bb4f98c1440b7298b376058928baf1fceb221a7f4520a92b7b9919bb3d"
   name = "k8s.io/klog"
   packages = ["."]
   pruneopts = "NT"
-  revision = "71442cd4037d612096940ceb0f3fec3f7fff66e0"
-  version = "v0.2.0"
+  revision = "e531227889390a39d9533dde61f590fe9f4b0035"
+  version = "v0.3.0"
 
 [[projects]]
   digest = "1:c48a795cd7048bb1888273bc604b6e69b22f9b8089c3df65f77cc527757b515c"
@@ -955,7 +955,6 @@
     "github.com/pkg/errors",
     "github.com/sirupsen/logrus",
     "github.com/spf13/pflag",
-    "golang.org/x/sys/unix",
     "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/runtime",
     "k8s.io/apimachinery/pkg/runtime/schema",
