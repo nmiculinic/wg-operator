@@ -326,11 +326,11 @@
 
 [[projects]]
   branch = "master"
-  digest = "1:25fcf800efa89808752c72014978b7b7cebd6f372826d401a4e849e44716468b"
+  digest = "1:a6a1fec678d8f24ac5405ea7d574282746f0856ffee8a5c63d271f562a223469"
   name = "github.com/nmiculinic/wg-quick-go"
   packages = ["."]
   pruneopts = "NT"
-  revision = "d80ea58156ebd20f1d2659bff4dd37f8176652f6"
+  revision = "f04d44ff8d43ab5afc75eb02ab399d7c3722064b"
 
 [[projects]]
   branch = "master"
