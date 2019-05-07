@@ -1,5 +1,6 @@
 wg_operator:
-  user: root
+  user: wg-operator
+  group: wireguard
   install_dir: /usr/local/bin
   config_dir: "/etc/wg-operator"
   version: v0.1.0

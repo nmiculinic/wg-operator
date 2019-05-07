@@ -5,7 +5,10 @@ After=network.target
 
 [Service]
 User={{ wg_operator.user }}
+Group={{ wg_operator.group }}
 Type=simple
+CapabilityBoundingSet=CAP_NET_ADMIN
+AmbientCapabilities=CAP_NET_ADMIN
 Environment=WATCH_NAMESPACE={{ wg_operator.watch_namespace}}
 ExecStart={{ wg_operator.install_dir }}/wg-operator \
 --kubeconfig {{ wg_operator.kubeconfig }} \

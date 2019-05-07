@@ -3,10 +3,14 @@
     name: "{{ wg_operator.user }}"
     create_home: false
     state: present
+- name: "create group"
+  group:
+    name: "{{ wg_operator.user }}"
+    state: present
 - name: Config dir
   file:
       path: "{{ wg_operator.config_dir }}"
-      group: "{{ wg_operator.user }}"
+      group: "{{ wg_operator.group }}"
       owner: "{{ wg_operator.user }}"
       state: directory
       mode: 0755
