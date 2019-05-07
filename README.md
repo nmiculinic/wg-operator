@@ -33,6 +33,14 @@ It's located at:
 
 * https://gitlab.com/neven-miculinic/wg-operator/container_registry
 
+Per tag images:
+
+* registry.gitlab.com/neven-miculinic/wg-operator:<tag>-<arch>
+
+Example:
+
+* registry.gitlab.com/neven-miculinic/wg-operator:v0.1.0-amd64
+
 Per branch images:
 
 registry.gitlab.com/neven-miculinic/wg-operator:<branch-name>-<arch>
@@ -45,3 +53,7 @@ Example:
 * registry.gitlab.com/neven-miculinic/wg-operator:master-amd64
 * registry.gitlab.com/neven-miculinic/wg-operator:master-arm32v7
 * registry.gitlab.com/neven-miculinic/wg-operator:master-arm64v8
+
+# Bare metal deployment
+
+There's ansible role in the `deploy/role` with example playbook in `deploy/playbook.yml`

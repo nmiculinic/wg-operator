@@ -1,0 +1,23 @@
+[Unit]
+Description=wg operator
+Documentation=https://github.com/KrakenSystems/wg-operator
+After=network.target
+
+[Service]
+User={{ wg_operator.user }}
+Type=simple
+Environment=WATCH_NAMESPACE={{ wg_operator.watch_namespace}}
+ExecStart={{ wg_operator.install_dir }}/wg-operator \
+--kubeconfig {{ wg_operator.kubeconfig }} \
+--mode=server \
+--route-metric=200 \
+--wg-interface=wg0 \
+--node-name={{ inventory_hostname }} \
+--wg-private-key-file=/etc/wireguard/wg0.key \
+--sync-config
+
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

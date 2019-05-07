@@ -1,0 +1,20 @@
+wg_operator:
+  user: root
+  install_dir: /usr/local/bin
+  config_dir: "/etc/wg-operator"
+  version: v0.1.0
+  watch_namespace: wg-operator
+  kubeconfig: "/etc/wg-operator/wg-operator.kubeconfig"
+  downloads:
+    x86_64:
+      suffix: amd64
+      checksum:
+        v0.1.0: sha256:6d87eba3902e3f0324620bdfb1d3d1dca160c4af84fe1a6e92b0d852ee2c7b01
+    aarch64:
+      suffix: arm64v8
+      checksum:
+        v0.1.0:  sha256:46f9ce228b74034380ff9daccf817e783534592a868d24bdd99f9214a0c2d55e
+    armv7l:
+      suffix: arm32v7
+      checksum:
+        v0.1.0: sha256:04db4d3fc2878343ad1d67e5eda3b7794c07ea46b35dad8de8f4ee3aae941005

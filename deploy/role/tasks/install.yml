@@ -1,0 +1,11 @@
+- name: Install x86-64
+  get_url:
+    url: "{{ download_url }}"
+    dest: "{{ wg_operator.install_dir }}/wg-operator"
+    checksum: "{{ download_checksum }}"
+    mode: 755
+    owner: root
+    group: root
+  vars:
+    download_url: https://github.com/KrakenSystems/wg-operator/releases/download/{{ wg_operator.version }}/wg-operator{{ wg_operator.downloads[ansible_architecture].suffix }}
+    download_checksum: "{{ wg_operator.downloads[ansible_architecture].checksum[wg_operator.version] }}"

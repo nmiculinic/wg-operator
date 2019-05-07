@@ -1,0 +1,26 @@
+- name: "create user"
+  user:
+    name: "{{ wg_operator.user }}"
+    create_home: false
+    state: present
+- name: Config dir
+  file:
+      path: "{{ wg_operator.config_dir }}"
+      group: "{{ wg_operator.user }}"
+      owner: "{{ wg_operator.user }}"
+      state: directory
+      mode: 0755
+- name: Setup systemd service
+  template:
+      dest: /etc/systemd/system/wg-operator.service
+      src: "templates/wg-operator.service.j2"
+      group: root
+      owner: root
+      mode: 0644
+  notify: wg-operator restart
+- name: Start system service
+  systemd:
+      name: wg-operator
+      enabled: true
+      daemon_reload: true
+      state: started

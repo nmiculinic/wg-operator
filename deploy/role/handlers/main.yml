@@ -1,0 +1,5 @@
+- name: wg-operator restart
+  systemd:
+      name: wg-operator
+      daemon_reload: yes
+      state: restarted
